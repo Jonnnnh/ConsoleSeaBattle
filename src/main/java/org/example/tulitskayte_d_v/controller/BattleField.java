@@ -24,9 +24,8 @@ public class BattleField { // TODO: необходимо изменить лог
         arrangeTheShips(ships);
     }
 
-    public BattleField arrangeTheShips(List<Ship> ships) {
+    public void arrangeTheShips(List<Ship> ships) {
         this.ships = ships;
-
         for (Ship s : ships) {
             for (int i = 0; i < s.getDecks().size(); i++) {
                 int row = s.getDecks().get(i).getRow();
@@ -35,7 +34,6 @@ public class BattleField { // TODO: необходимо изменить лог
                 System.out.print(" ");
             }
         }
-        return this;
     }
 
     public void createEmptyBattleField() {
@@ -140,9 +138,6 @@ public class BattleField { // TODO: необходимо изменить лог
             }
         }
         return null;
-    }
-    private static boolean isValidMove(Coordinate coordinate, Player enemy) {
-        return enemy.getBattleField().isValidMove(coordinate);
     }
 
     public BattleField clone() {

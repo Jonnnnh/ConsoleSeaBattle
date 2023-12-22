@@ -29,18 +29,11 @@ public class Player {
         return name;
     }
 
-
-    public void createBattleField (ArrayList<Ship> ships) {
-        gameStrategy.placeShips(battleField, ships);
-    }
     public GameStrategy getStrategy() {
         return gameStrategy;
     }
 
     public HitResults move(Coordinate coordinate) {
         return this.battleField.hitBattleField(coordinate);
-    }
-    public Coordinate makeMove() {
-        return gameStrategy.makeMove(battleField);
     }
 }

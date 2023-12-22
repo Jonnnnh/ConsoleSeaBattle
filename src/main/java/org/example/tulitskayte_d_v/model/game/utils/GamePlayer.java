@@ -11,7 +11,6 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.view.GameDisplay;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -59,20 +58,26 @@ public class GamePlayer {
         gameHistory.saveMove(new Move(gameStateBeforeMove, gameStateAfterMove));
 
         gameDisplay.printBothBattleFields((state == GamePhase.FIRST_PLAYER_MOTION) ? secondPlayer : firstPlayer, (state == GamePhase.FIRST_PLAYER_MOTION) ? firstPlayer : secondPlayer);
-        state = checkAndHandleReplayOption(firstPlayer, secondPlayer, state, gameHistory, sc);
+        state = checkAndHandleUndoOption(firstPlayer, secondPlayer, state, gameHistory, sc);
         return state;
-    }
 
-    private GamePhase checkAndHandleReplayOption(Player firstPlayer, Player secondPlayer, GamePhase state, GameHistory gameHistory, Scanner sc) {
-        if (isBotGame(firstPlayer, secondPlayer)) {
-            System.out.println("Желаете переиграть?");
+    }
+    // TODO: при обычном ходе, нас не перекидывает на 2 игрока, он печатается, но бы будто одним играем.
+    //  Также у нас не печатается поля 2 игрока, когда мы откатываем ход (можно так и оставить и учитывать 1-го игрока основным)
+    private GamePhase checkAndHandleUndoOption(Player firstPlayer, Player secondPlayer, GamePhase state, GameHistory gameHistory, Scanner sc) {
+        while (gameHistory.canUndo()) {
+            System.out.println("Желаете отменить ход? (да/нет)");
             String response = sc.nextLine();
-            if (response.equalsIgnoreCase("да") && gameHistory.canUndo()) {
-                Move lastMove = gameHistory.undoMove();
-                state = restoreGameState(lastMove.gameStateBeforeMove(), firstPlayer, secondPlayer);
+            if (response.equalsIgnoreCase("да")) {
+                GameState prevState = gameHistory.undo();
+                if (prevState != null) {
+                    restoreGameState(prevState, firstPlayer, secondPlayer);
+                    // Переключение текущего игрока
+                    state = prevState.getCurrentTurn() == GamePhase.FIRST_PLAYER_MOTION ? GamePhase.SECOND_PLAYER_MOTION : GamePhase.FIRST_PLAYER_MOTION;
+                    gameDisplay.printBothBattleFields(firstPlayer, secondPlayer);
+                }
             } else {
-                System.out.println("Нажмите Enter для следующего хода бота...");
-                sc.nextLine();
+                break;
             }
         }
         return state;
@@ -114,17 +119,12 @@ public class GamePlayer {
         boolean isValidMove;
 
         do {
-            if (!player.getStrategy().isBot()) {
-                gameDisplay.moveHint(player.getName());
-            }
             coordinate = player.getStrategy().makeMove(enemy.getBattleField());
-
             isValidMove = isValidMove(coordinate, enemy);
             if (!isValidMove) {
                 System.out.println("Неверный ход. Пожалуйста, выберите другие координаты.");
             }
         } while (!isValidMove);
-
         HitResults resultOfMove = enemy.move(coordinate);
         gameDisplay.processMoveResult(resultOfMove, player);
         return updateGameState(resultOfMove, state, player, enemy);
@@ -139,7 +139,6 @@ public class GamePlayer {
         String input = sc.nextLine();
         if (Objects.equals(input, "0")) {
             botCounter++;
-            // Изменено: используем конструктор без параметров для BotGeniusStrategy
             return new Player("Bot" + botCounter, new BotGeniusStrategy());
         } else {
             System.out.printf("\n%s, введите свое имя:\n", playerLabel);
@@ -152,6 +151,9 @@ public class GamePlayer {
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
+                if (!player.getStrategy().isBot()) {
+                    gameDisplay.arrangeHint(player.getName(), size);
+                }
                 ArrayList<Ship> ships = new ArrayList<>();
                 player.getStrategy().placeShips(new BattleField(size, ships), ships);
                 player.setBattleField(new BattleField(size, ships));
@@ -174,5 +176,4 @@ public class GamePlayer {
                 ? GamePhase.SECOND_PLAYER_MOTION
                 : GamePhase.FIRST_PLAYER_MOTION;
     }
-
 }

@@ -89,6 +89,7 @@ public class GameDisplay {
         }
     }
 
+    // TODO удалить не нужные методы
     public void arrangeHint(String name, int size) {
         String hint = createShipHint(FieldCalculator.calculateShipCounts(size));
         printShipArrangementInstructions(name, hint, size);
@@ -96,8 +97,10 @@ public class GameDisplay {
 
     private void printShipArrangementInstructions(String playerName, String hint, int fieldSize) {
         String lastColumnHeader = CoordinateHelper.numberCoordinateToLetter(fieldSize - 1);
-        System.out.printf("%s, расставьте корабли следующим образом: %s.\n" +
-                        "Каждый корабль должен иметь координаты X (A-%s) и Y (1-%d) в зависимости от размера поля.\n",
+        System.out.printf("""
+                        %s, расставьте корабли следующим образом: %s.
+                        Каждый корабль должен иметь координаты X (A-%s) и Y (1-%d) в зависимости от размера поля.
+                        """,
                 playerName, hint, lastColumnHeader, fieldSize);
     }
 
@@ -125,10 +128,6 @@ public class GameDisplay {
                 System.out.printf(TextHelper.ANSI_RED + "\n%s, Выстрела не было.\n" + TextHelper.ANSI_RESET, player.getName());
                 break;
         }
-    }
-
-    public void moveHint(String name) {
-        System.out.printf("\n%s, Передайте координаты точки, куда хотите нанести удар (например, G1 или g1')\n", name);
     }
 
     public void printWinner(String name) {

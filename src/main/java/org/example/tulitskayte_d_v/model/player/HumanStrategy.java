@@ -27,14 +27,14 @@ public class HumanStrategy implements GameStrategy {
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
         while (true) {
             try {
-                System.out.println("Введите расположение кораблей (например, A1-A2, B1-B4):");
+                System.out.println("\nВведите расположение кораблей (например, g1-g2, D1-D4):");
                 String shipPlacement = scanner.nextLine();
                 List<Ship> parsedShips = GameUtils.convertStringToShips(battleField.getSize(), shipPlacement);
                 ships.addAll(parsedShips);
                 battleField.arrangeTheShips(ships);
                 break;
             } catch (IllegalArgumentException e) {
-                System.out.println("Ошибка: " + e.getMessage() + " Пожалуйста, попробуйте еще раз.");
+                System.out.println("Ошибка: " + e.getMessage() + "\nПожалуйста, попробуйте еще раз.");
             }
         }
     }
@@ -43,11 +43,9 @@ public class HumanStrategy implements GameStrategy {
     public Coordinate makeMove(BattleField enemyBattleField) {
         while (true) {
             try {
-                System.out.println("Введите координаты для атаки (например, A1):");
+                System.out.println("\nВведите координаты для атаки (например, g1):");
                 String input = scanner.nextLine();
                 Coordinate coordinate = CoordinateParser.getCoordinate(input);
-
-                // Проверка, что координаты в пределах поля
                 if (!isValidCoordinate(coordinate, enemyBattleField)) {
                     System.out.println("Неверный ход. Выберите координаты в пределах поля.");
                     continue;
