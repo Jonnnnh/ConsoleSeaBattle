@@ -17,6 +17,7 @@ import java.util.Scanner;
 public class GamePlayer {
     private int botCounter = 0;
     private final GameDisplay gameDisplay;
+    private int fieldSize;
 
     public GamePlayer() {
         this.gameDisplay = new GameDisplay();
@@ -24,14 +25,14 @@ public class GamePlayer {
 
     public void startGame(Player firstPlayer, Player secondPlayer) {
         Scanner sc = new Scanner(System.in);
-        int size = promptForFieldSize(sc);
-        setupGame(sc, firstPlayer, secondPlayer, size);
+        fieldSize = promptForFieldSize(sc);
+        setupGame(sc, firstPlayer, secondPlayer);
         playGame(firstPlayer, secondPlayer, sc);
     }
 
-    private void setupGame(Scanner sc, Player firstPlayer, Player secondPlayer, int size) {
-        setupPlayerShips(sc, firstPlayer, size);
-        setupPlayerShips(sc, secondPlayer, size);
+    private void setupGame(Scanner sc, Player firstPlayer, Player secondPlayer) {
+        setupPlayerShips(sc, firstPlayer);
+        setupPlayerShips(sc, secondPlayer);
     }
 
     private void playGame(Player firstPlayer, Player secondPlayer, Scanner sc) {
@@ -62,8 +63,7 @@ public class GamePlayer {
         return state;
 
     }
-    // TODO: при обычном ходе, нас не перекидывает на 2 игрока, он печатается, но бы будто одним играем.
-    //  Также у нас не печатается поля 2 игрока, когда мы откатываем ход (можно так и оставить и учитывать 1-го игрока основным)
+
     private GamePhase checkAndHandleUndoOption(Player firstPlayer, Player secondPlayer, GamePhase state, GameHistory gameHistory, Scanner sc) {
         while (gameHistory.canUndo()) {
             System.out.println("Желаете отменить ход? (да/нет)");
@@ -72,8 +72,7 @@ public class GamePlayer {
                 GameState prevState = gameHistory.undo();
                 if (prevState != null) {
                     restoreGameState(prevState, firstPlayer, secondPlayer);
-                    // Переключение текущего игрока
-                    state = prevState.getCurrentTurn() == GamePhase.FIRST_PLAYER_MOTION ? GamePhase.SECOND_PLAYER_MOTION : GamePhase.FIRST_PLAYER_MOTION;
+                    state = prevState.getCurrentTurn() == GamePhase.FIRST_PLAYER_MOTION ? GamePhase.SECOND_PLAYER_MOTION : GamePhase.FIRST_PLAYER_MOTION; // переключение текущего игрока
                     gameDisplay.printBothBattleFields(firstPlayer, secondPlayer);
                 }
             } else {
@@ -109,8 +108,8 @@ public class GamePlayer {
     }
 
     private GamePhase restoreGameState(GameState gameState, Player firstPlayer, Player secondPlayer) {
-        firstPlayer.setBattleField(gameState.getBattleFieldPlayer1().clone()); // восстановление состояния игровых полей
-        secondPlayer.setBattleField(gameState.getBattleFieldPlayer2().clone());
+        firstPlayer.setBattleField(gameState.getBattleFieldPlayer1().deepCopy()); // восстановление состояния игровых полей
+        secondPlayer.setBattleField(gameState.getBattleFieldPlayer2().deepCopy());
         return gameState.getCurrentTurn();// восстановление текущей фазы игры
     }
 
@@ -137,26 +136,38 @@ public class GamePlayer {
     public Player initializePlayer(Scanner sc, String playerLabel) {
         System.out.printf("\n%s, введите 0, если хотите, чтобы вашу игру вел бот.\n", playerLabel);
         String input = sc.nextLine();
+        GameStrategy strategy;
+        String playerName;
+
         if (Objects.equals(input, "0")) {
             botCounter++;
-            return new Player("Bot" + botCounter, new BotGeniusStrategy());
+            playerName = "Bot" + botCounter;
+            strategy = chooseBotStrategy(); // Выбор стратегии для бота
         } else {
             System.out.printf("\n%s, введите свое имя:\n", playerLabel);
-            String playerName = sc.nextLine();
-            return new Player(playerName, new HumanStrategy());
+            playerName = sc.nextLine();
+            strategy = new HumanStrategy();
+        }
+
+        return new Player(playerName, strategy);
+    }
+    private GameStrategy chooseBotStrategy() {
+        if (fieldSize > 30) {
+            return new BotDiagonalStrategy();
+        } else {
+            return new BotGeniusStrategy();
         }
     }
-
-    public void setupPlayerShips(Scanner sc, Player player, int size) {
+    public void setupPlayerShips(Scanner sc, Player player) {
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
                 if (!player.getStrategy().isBot()) {
-                    gameDisplay.arrangeHint(player.getName(), size);
+                    gameDisplay.arrangeHint(player.getName(), fieldSize);
                 }
                 ArrayList<Ship> ships = new ArrayList<>();
-                player.getStrategy().placeShips(new BattleField(size, ships), ships);
-                player.setBattleField(new BattleField(size, ships));
+                player.getStrategy().placeShips(new BattleField(fieldSize, ships), ships);
+                player.setBattleField(new BattleField(fieldSize, ships));
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Ошибка: " + e.getMessage());

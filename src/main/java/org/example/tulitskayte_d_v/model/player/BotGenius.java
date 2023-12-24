@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class BotGenius {
 
-    public static String generateBotShipPlacement(int size) {
+    public static String generateBotShipPlacement(int size) { // рандом расположение
         List<Ship> ships = new ArrayList<>();
         BattleField field = new BattleField(size, ships);
         int[] shipCounts = FieldCalculator.calculateShipCounts(size);
@@ -26,27 +26,27 @@ public class BotGenius {
 
         for (int shipType = shipCounts.length; shipType >= 1; shipType--) {
             for (int j = 0; j < shipCounts[shipType - 1]; j++) {
-                placeShipRandomly(field, ships, shipType, random);
+                placeSingleShipRandomly(field, ships, shipType, random);
             }
         }
-        return convertShipsToString(ships);
+        return convertShipsPlacementToString(ships);
     }
 
-    private static void placeShipRandomly(BattleField field, List<Ship> ships, int shipType, Random random) {
+    private static void placeSingleShipRandomly(BattleField field, List<Ship> ships, int shipType, Random random) { // размещаем
         boolean placed = false;
         while (!placed) {
             int row = random.nextInt(field.getSize());
             int col = random.nextInt(field.getSize());
             boolean horizontal = random.nextBoolean();
 
-            if (canPlaceShip(field, row, col, shipType, horizontal)) {
-                placeShip(field, ships, row, col, shipType, horizontal);
+            if (isShipPlacementValid(field, row, col, shipType, horizontal)) { // проверка на размещение
+                addShipToBattleField(field, ships, row, col, shipType, horizontal);
                 placed = true;
             }
         }
     }
 
-    private static String convertShipsToString(List<Ship> ships) {
+    private static String convertShipsPlacementToString(List<Ship> ships) {
         StringBuilder sb = new StringBuilder();
         for (Ship ship : ships) {
             Coordinate start = new Coordinate(ship.getDecks().getFirst().getRow(), ship.getDecks().getFirst().getColumn());
@@ -69,7 +69,7 @@ public class BotGenius {
         return sb.toString();
     }
 
-    private static void placeShip(BattleField field, List<Ship> ships, int row, int col, int shipSize, boolean horizontal) {
+    private static void addShipToBattleField(BattleField field, List<Ship> ships, int row, int col, int shipSize, boolean horizontal) {
         List<ShipDeck> shipDecks = new ArrayList<>();
         for (int i = 0; i < shipSize; i++) {
             int currentRow = row + (horizontal ? 0 : i);
@@ -82,7 +82,7 @@ public class BotGenius {
         ships.add(newShip);
     }
 
-    private static boolean canPlaceShip(BattleField field, int row, int col, int shipSize, boolean horizontal) {
+    private static boolean isShipPlacementValid(BattleField field, int row, int col, int shipSize, boolean horizontal) {
         int fieldSize = field.getSize();
         for (int i = 0; i < shipSize; i++) {
             int currentRow = row + (horizontal ? 0 : i);
@@ -108,23 +108,23 @@ public class BotGenius {
         return true;
     }
 
-    public static Coordinate botMove(BattleField enemyBattleField) {
-        List<Coordinate> potentialTargets = getPotentialHurtTargets(enemyBattleField);
+    public static Coordinate calculateBotNextMove(BattleField enemyBattleField) {
+        List<Coordinate> potentialTargets = findTargetsAroundHurtShip(enemyBattleField);
 
         if (!potentialTargets.isEmpty()) {
-            return chooseTargetFromList(potentialTargets, enemyBattleField);
+            return selectRandomTargetFromList(potentialTargets, enemyBattleField);
         }
-        return getRandomValidCoordinate(enemyBattleField);
+        return findRandomValidAttackCoordinate(enemyBattleField);
     }
 
-    private static List<Coordinate> getPotentialHurtTargets(BattleField enemyBattleField) {
+    protected static List<Coordinate> findTargetsAroundHurtShip(BattleField enemyBattleField) {
         List<Coordinate> potentialTargets = new ArrayList<>();
         for (Ship ship : enemyBattleField.getShips()) {
             if (ship.getState() == ShipStates.HURT) {
                 for (ShipDeck deck : ship.getDecks()) {
                     if (deck.getState() == DeckConditions.HURT) {
                         Coordinate lastHit = new Coordinate(deck.getRow(), deck.getColumn());
-                        potentialTargets.addAll(getTargetLine(lastHit, ship, enemyBattleField));
+                        potentialTargets.addAll(calculateAttackLineForHurtShip(lastHit, ship, enemyBattleField));
                         break; // Прерываем цикл после нахождения первой поврежденной палубы
                     }
                 }
@@ -133,9 +133,8 @@ public class BotGenius {
         return potentialTargets;
     }
 
-    private static List<Coordinate> getTargetLine(Coordinate lastHit, Ship hurtShip, BattleField enemyBattleField) {
+    protected static List<Coordinate> calculateAttackLineForHurtShip(Coordinate lastHit, Ship hurtShip, BattleField enemyBattleField) {
         List<Coordinate> lineTargets = new ArrayList<>();
-
         // Получаем список поврежденных палуб корабля
         List<ShipDeck> hurtDecks = hurtShip.getDecks().stream()
                 .filter(deck -> deck.getState() == DeckConditions.HURT)
@@ -146,48 +145,46 @@ public class BotGenius {
             Coordinate secondLastHit = new Coordinate(secondLastHitDeck.getRow(), secondLastHitDeck.getColumn());
             int dRow = lastHit.getRow() - secondLastHit.getRow();
             int dCol = lastHit.getColumn() - secondLastHit.getColumn();
-
             // Проверяем следующую и противоположную координаты в линии попаданий
-            addLineTargetIfExists(lineTargets, lastHit.getRow() + dRow, lastHit.getColumn() + dCol, enemyBattleField);
-            addLineTargetIfExists(lineTargets, hurtDecks.getFirst().getRow() - dRow, hurtDecks.getFirst().getColumn() - dCol, enemyBattleField);
+            addTargetIfValid(lineTargets, lastHit.getRow() + dRow, lastHit.getColumn() + dCol, enemyBattleField);
+            addTargetIfValid(lineTargets, hurtDecks.getFirst().getRow() - dRow, hurtDecks.getFirst().getColumn() - dCol, enemyBattleField);
         } else {
             // Добавляем соседние координаты, если у корабля только одна поврежденная палуба
-            lineTargets.addAll(getAdjacentCoordinates(lastHit, enemyBattleField));
+            lineTargets.addAll(findAdjacentTargets(lastHit, enemyBattleField));
         }
 
         return lineTargets;
     }
-    private static void addLineTargetIfExists(List<Coordinate> lineTargets, int row, int col, BattleField enemyBattleField) {
-        if (isValidCoordinate(row, col, enemyBattleField)) {
+    private static void addTargetIfValid(List<Coordinate> lineTargets, int row, int col, BattleField enemyBattleField) {
+        if (isCoordinateValidForAttack(row, col, enemyBattleField)) {
             lineTargets.add(new Coordinate(row, col));
         }
     }
-    private static List<Coordinate> getAdjacentCoordinates(Coordinate coordinate, BattleField enemyBattleField) {
+    private static List<Coordinate> findAdjacentTargets(Coordinate coordinate, BattleField enemyBattleField) {
         List<Coordinate> adjacentCoordinates = new ArrayList<>();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
         for (int[] dir : directions) {
             int newRow = coordinate.getRow() + dir[0];
             int newCol = coordinate.getColumn() + dir[1];
-            if (isValidCoordinate(newRow, newCol, enemyBattleField)) {
+            if (isCoordinateValidForAttack(newRow, newCol, enemyBattleField)) {
                 adjacentCoordinates.add(new Coordinate(newRow, newCol));
             }
         }
         return adjacentCoordinates;
     }
 
-    private static boolean isValidCoordinate(int row, int col, BattleField enemyBattleField) {
+    protected static boolean isCoordinateValidForAttack(int row, int col, BattleField enemyBattleField) {
         int size = enemyBattleField.getSize();
         return row >= 0 && row < size && col >= 0 && col < size &&
-                enemyBattleField.getCells()[row][col].getState() == CellStates.NULL;
+                enemyBattleField.getCells()[row][col].getState() == CellStates.EMPTY;
     }
 
-    private static boolean isValidCoordinate(Coordinate coordinate, BattleField enemyBattleField) {
-        return isValidCoordinate(coordinate.getRow(), coordinate.getColumn(), enemyBattleField);
+    protected static boolean isCoordinateValidForAttack(Coordinate coordinate, BattleField enemyBattleField) {
+        return isCoordinateValidForAttack(coordinate.getRow(), coordinate.getColumn(), enemyBattleField);
     }
 
-
-    private static Coordinate getRandomValidCoordinate(BattleField enemyBattleField) {
+    private static Coordinate findRandomValidAttackCoordinate(BattleField enemyBattleField) {
         Random rnd = new Random();
         int size = enemyBattleField.getSize();
         Coordinate coordinate;
@@ -195,11 +192,11 @@ public class BotGenius {
             int row = rnd.nextInt(size);
             int col = rnd.nextInt(size);
             coordinate = new Coordinate(row, col);
-        } while (!isValidCoordinate(coordinate, enemyBattleField));
+        } while (!isCoordinateValidForAttack(coordinate, enemyBattleField));
         return coordinate;
     }
 
-    private static Coordinate chooseTargetFromList(List<Coordinate> targets, BattleField enemyBattleField) {
+    protected static Coordinate selectRandomTargetFromList(List<Coordinate> targets, BattleField enemyBattleField) {
         Random rnd = new Random();
         return targets.get(rnd.nextInt(targets.size()));
     }

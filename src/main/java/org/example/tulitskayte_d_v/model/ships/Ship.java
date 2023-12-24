@@ -2,7 +2,6 @@ package org.example.tulitskayte_d_v.model.ships;
 
 
 import org.example.tulitskayte_d_v.model.game.Coordinate;
-import org.example.tulitskayte_d_v.model.game.utils.CoordinateParser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,28 +40,38 @@ public class Ship {
         return state;
     }
 
-    public int getAliveDecksCounter() {
-        return aliveDecksCounter;
+
+    public ShipStates hitTheShip(Coordinate coordinate) { // обработка попаданий по кораблю в определенной координате
+        ShipDeck targetDeck = getDeckAtCoordinate(coordinate);
+        if (targetDeck != null) {
+            targetDeck.hitTheDeck();
+            aliveDecksCounter--;
+            updateShipState();
+            return this.state;
+        }
+        return ShipStates.UNTAPPED;
     }
 
-    public ShipStates hitTheShip(Coordinate coordinate) {
+    private ShipDeck getDeckAtCoordinate(Coordinate coordinate) {
         for (ShipDeck shipDeck : shipDecks) {
             if (shipDeck.getRow() == coordinate.getRow() && shipDeck.getColumn() == coordinate.getColumn()) {
-                shipDeck.hitTheDeck(); // ударяю палубу
-                aliveDecksCounter--;
+                return shipDeck;
             }
         }
-        if (aliveDecksCounter == 0) { // обновляю статус корабля
+        return null;
+    }
+
+    private void updateShipState() {
+        if (aliveDecksCounter == 0) {
             this.state = ShipStates.KILLED;
         } else if (aliveDecksCounter != shipDecks.size()) {
             this.state = ShipStates.HURT;
         }
-        return this.state;
     }
-    public Ship clone() {
+    public Ship deepCopy() {
         List<ShipDeck> clonedDecks = new ArrayList<>();
         for (ShipDeck deck : this.shipDecks) {
-            clonedDecks.add(deck.clone());
+            clonedDecks.add(deck.deepCopy());
         }
         return new Ship(clonedDecks);
     }

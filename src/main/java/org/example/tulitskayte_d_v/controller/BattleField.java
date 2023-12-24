@@ -3,7 +3,6 @@ package org.example.tulitskayte_d_v.controller;
 import org.example.tulitskayte_d_v.cell.Cell;
 import org.example.tulitskayte_d_v.cell.CellStates;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
-import org.example.tulitskayte_d_v.model.player.Player;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.model.ships.ShipDeck;
@@ -12,7 +11,7 @@ import org.example.tulitskayte_d_v.model.ships.ShipStates;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BattleField { // TODO: необходимо изменить логику расстановки кораблей, чтобы она соответствовала новому размеру поля
+public class BattleField {
     public int size;
     protected Cell[][] cells;
     protected List<Ship> ships;
@@ -39,7 +38,7 @@ public class BattleField { // TODO: необходимо изменить лог
     public void createEmptyBattleField() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                cells[i][j] = new Cell(i, j);
+                cells[i][j] = new Cell(i, j, false);
             }
         }
     }
@@ -89,6 +88,7 @@ public class BattleField { // TODO: необходимо изменить лог
             makeChecked(row, column);
         }
     }
+
     public boolean isValidMove(Coordinate coordinate) {
         int row = coordinate.getRow();
         int column = coordinate.getColumn();
@@ -97,6 +97,7 @@ public class BattleField { // TODO: необходимо изменить лог
         }
         return getCells()[row][column].getState() != CellStates.CHECKED;
     }
+
     private void makeChecked(int row, int column) {
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = column - 1; j <= column + 1; j++) {
@@ -110,6 +111,7 @@ public class BattleField { // TODO: необходимо изменить лог
     private boolean isWithinBounds(int row, int column) {
         return row >= 0 && row < getSize() && column >= 0 && column < getSize();
     }
+
     public Cell[][] getCells() {
         return cells;
     }
@@ -126,9 +128,11 @@ public class BattleField { // TODO: необходимо изменить лог
         }
         return true;
     }
+
     public int getSize() {
         return size;
     }
+
     public ShipDeck getShip(int row, int column) {
         for (Ship ship : ships) {
             for (ShipDeck shipDeck : ship.getDecks()) {
@@ -140,16 +144,16 @@ public class BattleField { // TODO: необходимо изменить лог
         return null;
     }
 
-    public BattleField clone() {
+    public BattleField deepCopy() {
         List<Ship> clonedShips = new ArrayList<>();
         for (Ship ship : this.ships) {
-            clonedShips.add(ship.clone());
+            clonedShips.add(ship.deepCopy());
         }
 
         BattleField clonedBattleField = new BattleField(getSize(), clonedShips);
         for (int i = 0; i < this.cells.length; i++) {
             for (int j = 0; j < this.cells[i].length; j++) {
-                clonedBattleField.getCells()[i][j] = this.cells[i][j].clone();
+                clonedBattleField.getCells()[i][j] = this.cells[i][j].deepCopy();
             }
         }
         return clonedBattleField;

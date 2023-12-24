@@ -8,8 +8,8 @@ public class GameState {
     private final GamePhase currentTurn;
 
     public GameState(BattleField battleFieldPlayer1, BattleField battleFieldPlayer2, GamePhase currentTurn) {
-        this.battleFieldPlayer1 = battleFieldPlayer1.clone();
-        this.battleFieldPlayer2 = battleFieldPlayer2.clone();
+        this.battleFieldPlayer1 = battleFieldPlayer1.deepCopy();
+        this.battleFieldPlayer2 = battleFieldPlayer2.deepCopy();
         this.currentTurn = currentTurn;
     }
 

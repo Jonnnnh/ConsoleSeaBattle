@@ -9,28 +9,17 @@ public class Cell {
     private CellStates state;
     private ShipDeck shipDeck;
 
-    public Cell(int row, int column) {
-        this.row = row;
-        this.column = column;
-        this.shipHere = false;
-        this.state = CellStates.NULL;
-    }
-
     public Cell(int column, int row, boolean shipHere) {
-        this.column = column;
         this.row = row;
+        this.column = column;
         this.shipHere = shipHere;
-        this.state = CellStates.NULL;
-        this.shipDeck = null;
+        this.state = CellStates.EMPTY;
     }
-    public Cell clone() {
+    public Cell deepCopy() {
         Cell clonedCell = new Cell(this.row, this.column, this.shipHere);
         clonedCell.setState(this.state);
+        clonedCell.setShipDeck(this.shipDeck != null ? this.shipDeck.deepCopy() : null);
         return clonedCell;
-    }
-
-    public String stateToStr() {
-        return state.toString();
     }
 
     public void setShipHere() {

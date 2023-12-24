@@ -28,7 +28,7 @@ public class BotGeniusStrategy implements GameStrategy {
 
     @Override
     public Coordinate makeMove(BattleField enemyBattleField) {
-        return BotGenius.botMove(enemyBattleField);
+        return BotGenius.calculateBotNextMove(enemyBattleField);
     }
 
 }

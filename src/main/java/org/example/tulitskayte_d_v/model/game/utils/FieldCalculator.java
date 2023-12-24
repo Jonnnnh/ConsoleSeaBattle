@@ -5,7 +5,7 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 import java.util.Arrays;
 
-public class FieldCalculator {
+public class FieldCalculator { // TODO: разделить на более мелкие методы, чтобы рассчитывать для определенного корабля
     private static final double[] fieldSizes = new double[]{5, 10, 15, 20, 25, 30, 50, 70, 100};
     private static final double[] oneDeckShipCounts = new double[]{3, 4, 6, 8, 10, 12, 20, 28, 40};
     private static final double[] twoDeckShipCounts = new double[]{2, 3, 4, 5, 6, 7, 11, 15, 21};

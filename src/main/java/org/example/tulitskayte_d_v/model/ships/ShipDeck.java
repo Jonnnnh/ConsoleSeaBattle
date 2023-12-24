@@ -38,10 +38,14 @@ public class ShipDeck {
         this.state = DeckConditions.HURT;
         this.enemyState = OpponentDeckConditions.VISIBLE;
     }
-    public ShipDeck clone() {
-        ShipDeck clonedDeck = new ShipDeck(this.row, this.column);
-        clonedDeck.setState(this.state); // Копирование состояния палубы
-        clonedDeck.enemyState = this.enemyState; // Копирование состояния палубы для противника
-        return clonedDeck;
+    public ShipDeck(ShipDeck other) {
+        this.row = other.row;
+        this.column = other.column;
+        this.state = other.state;
+        this.enemyState = other.enemyState;
+    }
+
+    public ShipDeck deepCopy() {
+        return new ShipDeck(this);
     }
 }
