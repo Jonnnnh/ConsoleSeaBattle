@@ -89,7 +89,6 @@ public class GameDisplay {
         }
     }
 
-    // TODO удалить не нужные методы
     public void arrangeHint(String name, int size) {
         String hint = createShipHint(FieldCalculator.calculateShipCounts(size));
         printShipArrangementInstructions(name, hint, size);

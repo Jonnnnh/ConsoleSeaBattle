@@ -107,6 +107,7 @@ public class GamePlayer {
         return firstPlayer.getStrategy().isBot() && secondPlayer.getStrategy().isBot();
     }
 
+
     private GamePhase restoreGameState(GameState gameState, Player firstPlayer, Player secondPlayer) {
         firstPlayer.setBattleField(gameState.getBattleFieldPlayer1().deepCopy()); // восстановление состояния игровых полей
         secondPlayer.setBattleField(gameState.getBattleFieldPlayer2().deepCopy());
@@ -116,7 +117,6 @@ public class GamePlayer {
     public GamePhase playerMove(Player player, Player enemy, GamePhase state) {
         Coordinate coordinate;
         boolean isValidMove;
-
         do {
             coordinate = player.getStrategy().makeMove(enemy.getBattleField());
             isValidMove = isValidMove(coordinate, enemy);
@@ -142,7 +142,7 @@ public class GamePlayer {
         if (Objects.equals(input, "0")) {
             botCounter++;
             playerName = "Bot" + botCounter;
-            strategy = chooseBotStrategy(); // Выбор стратегии для бота
+            strategy = chooseBotStrategy(); // выбор стратегии для бота
         } else {
             System.out.printf("\n%s, введите свое имя:\n", playerLabel);
             playerName = sc.nextLine();
@@ -152,7 +152,7 @@ public class GamePlayer {
         return new Player(playerName, strategy);
     }
     private GameStrategy chooseBotStrategy() {
-        if (fieldSize > 30) {
+        if (fieldSize >= 30) {
             return new BotDiagonalStrategy();
         } else {
             return new BotGeniusStrategy();

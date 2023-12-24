@@ -5,7 +5,7 @@ import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
 
 import java.util.Arrays;
 
-public class FieldCalculator { // TODO: разделить на более мелкие методы, чтобы рассчитывать для определенного корабля
+public class FieldCalculator {
     private static final double[] fieldSizes = new double[]{5, 10, 15, 20, 25, 30, 50, 70, 100};
     private static final double[] oneDeckShipCounts = new double[]{3, 4, 6, 8, 10, 12, 20, 28, 40};
     private static final double[] twoDeckShipCounts = new double[]{2, 3, 4, 5, 6, 7, 11, 15, 21};
@@ -22,20 +22,46 @@ public class FieldCalculator { // TODO: разделить на более ме�
         if (fieldSize < 5) {
             throw new IllegalArgumentException("Размер поля должен быть не менее 5");
         }
+
         if (fieldSize <= 100) {
-            shipCounts[0] = (int) calculateSplineValue(fieldSizes, oneDeckShipCounts, fieldSize);
-            shipCounts[1] = (int) calculateSplineValue(fieldSizes, twoDeckShipCounts, fieldSize);
-            shipCounts[2] = (int) calculateSplineValue(fieldSizes, threeDeckShipCounts, fieldSize);
-            shipCounts[3] = (int) calculateSplineValue(fieldSizes, fourDeckShipCounts, fieldSize);
+            shipCounts[0] = calculateOneDeckShipCount(fieldSize);
+            shipCounts[1] = calculateTwoDeckShipCount(fieldSize);
+            shipCounts[2] = calculateThreeDeckShipCount(fieldSize);
+            shipCounts[3] = calculateFourDeckShipCount(fieldSize);
         } else {
             shipCounts[0] = calculateExtrapolatedValue(fieldSize, fieldSizes, oneDeckShipCounts);
             shipCounts[1] = calculateExtrapolatedValue(fieldSize, fieldSizes, twoDeckShipCounts);
             shipCounts[2] = calculateExtrapolatedValue(fieldSize, fieldSizes, threeDeckShipCounts);
             shipCounts[3] = calculateExtrapolatedValue(fieldSize, fieldSizes, fourDeckShipCounts);
-
         }
 
         return shipCounts;
+    }
+
+    private static int calculateOneDeckShipCount(int fieldSize) {
+        SplineInterpolator interpolator = new SplineInterpolator();
+        PolynomialSplineFunction splineFunction = interpolator.interpolate(fieldSizes, oneDeckShipCounts);
+        return (int) splineFunction.value(fieldSize);
+    }
+
+    private static int calculateTwoDeckShipCount(int fieldSize) {
+        SplineInterpolator interpolator = new SplineInterpolator();
+        PolynomialSplineFunction splineFunction = interpolator.interpolate(fieldSizes, twoDeckShipCounts);
+        return (int) splineFunction.value(fieldSize);
+    }
+
+    private static int calculateThreeDeckShipCount(int fieldSize) {
+        SplineInterpolator interpolator = new SplineInterpolator();
+        PolynomialSplineFunction splineFunction = interpolator.interpolate(fieldSizes, threeDeckShipCounts);
+        return (int) splineFunction.value(fieldSize);
+    }
+
+    private static int calculateFourDeckShipCount(int fieldSize) {
+        double[] x = fieldSizes;
+        double[] y = fourDeckShipCounts;
+        SplineInterpolator interpolator = new SplineInterpolator();
+        PolynomialSplineFunction splineFunction = interpolator.interpolate(x, y);
+        return (int) splineFunction.value(fieldSize);
     }
 
     private static int calculateExtrapolatedValue(int fieldSize, double[] sizes, double[] counts) {
@@ -49,11 +75,5 @@ public class FieldCalculator { // TODO: разделить на более ме�
         double intercept = y1 - slope * x1;
 
         return (int) (slope * fieldSize + intercept);
-    }
-
-    private static double calculateSplineValue(double[] x, double[] y, int xValue) {
-        SplineInterpolator interpolator = new SplineInterpolator();
-        PolynomialSplineFunction splineFunction = interpolator.interpolate(x, y);
-        return splineFunction.value(xValue);
     }
 }

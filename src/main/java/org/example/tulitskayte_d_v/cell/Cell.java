@@ -7,18 +7,18 @@ public class Cell {
     private final int row;
     private boolean shipHere;
     private CellStates state;
-    private ShipDeck shipDeck;
+    private final ShipDeck shipDeck;
 
     public Cell(int column, int row, boolean shipHere) {
-        this.row = row;
         this.column = column;
+        this.row = row;
         this.shipHere = shipHere;
         this.state = CellStates.EMPTY;
+        this.shipDeck = null;
     }
     public Cell deepCopy() {
         Cell clonedCell = new Cell(this.row, this.column, this.shipHere);
         clonedCell.setState(this.state);
-        clonedCell.setShipDeck(this.shipDeck != null ? this.shipDeck.deepCopy() : null);
         return clonedCell;
     }
 
@@ -39,10 +39,5 @@ public class Cell {
     }
     public ShipDeck getShipDeck() {
         return shipDeck;
-    }
-
-    public void setShipDeck(ShipDeck shipDeck) {
-        this.shipDeck = shipDeck;
-        this.shipHere = (shipDeck != null);
     }
 }
