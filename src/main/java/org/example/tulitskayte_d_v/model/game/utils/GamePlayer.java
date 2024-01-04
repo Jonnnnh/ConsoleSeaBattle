@@ -142,7 +142,7 @@ public class GamePlayer {
         if (Objects.equals(input, "0")) {
             botCounter++;
             playerName = "Bot" + botCounter;
-            strategy = chooseBotStrategy(); // выбор стратегии для бота
+            strategy = new BotGeniusStrategy();
         } else {
             System.out.printf("\n%s, enter your name:\n", playerLabel);
             playerName = sc.nextLine();
@@ -151,13 +151,7 @@ public class GamePlayer {
 
         return new Player(playerName, strategy);
     }
-    private GameStrategy chooseBotStrategy() {
-        if (fieldSize >= 30) {
-            return new BotDiagonalStrategy();
-        } else {
-            return new BotGeniusStrategy();
-        }
-    }
+
     public void setupPlayerShips(Scanner sc, Player player) {
         boolean shipsArranged = false;
         while (!shipsArranged) {

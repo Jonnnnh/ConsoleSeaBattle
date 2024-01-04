@@ -68,7 +68,7 @@ public class HumanStrategy implements GameStrategy {
         String hint = GameDisplay.createShipHint(FieldCalculator.calculateShipCounts(size));
         printShipArrangementInstructions(name, hint, size);
     }
-    private static void printShipArrangementInstructions(String playerName, String hint, int fieldSize) { // перенести метод
+    private static void printShipArrangementInstructions(String playerName, String hint, int fieldSize) {
         String lastColumnHeader = CoordinateHelper.numberCoordinateToLetter(fieldSize - 1);
         System.out.printf("""
                         %s, arrange your ships as follows: %s.
