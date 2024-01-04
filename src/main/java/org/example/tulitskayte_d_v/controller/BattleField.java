@@ -98,7 +98,7 @@ public class BattleField {
         return getCells()[row][column].getState() != CellStates.CHECKED;
     }
 
-    private void makeChecked(int row, int column) {
+    private void makeChecked(int row, int column) { // отмечаем клетки вокруг уничтоженного корабля
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = column - 1; j <= column + 1; j++) {
                 if (isWithinBounds(i, j)) {

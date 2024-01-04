@@ -1,10 +1,12 @@
-package org.example.tulitskayte_d_v.model.player;
+package org.example.tulitskayte_d_v.controller;
 
 import org.example.tulitskayte_d_v.cell.Cell;
 import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
+import org.example.tulitskayte_d_v.model.ships.ShipDeck;
+import org.example.tulitskayte_d_v.model.ships.ShipStates;
 
 import java.util.List;
 
@@ -22,6 +24,11 @@ public class BattleFieldManager {
             throw new IllegalStateException("Invalid move");
         }
         return battleField.hitBattleField(coordinate);
+    }
+
+    // метод для установки кораблей
+    public void arrangeShips(List<Ship> ships) {
+        battleField.arrangeTheShips(ships);
     }
 
     // возвращает копию данных, предотвращая непосредственное изменение внутреннего состояния

@@ -21,7 +21,6 @@ public class HumanStrategy implements GameStrategy {
         this.scanner = new Scanner(System.in);
     }
 
-
     @Override
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
         while (true) {
