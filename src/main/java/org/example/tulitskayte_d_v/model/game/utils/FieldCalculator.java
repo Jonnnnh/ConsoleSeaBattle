@@ -20,7 +20,7 @@ public class FieldCalculator {
     public static int[] calculateShipCounts(int fieldSize) {
         int[] shipCounts = new int[4];
         if (fieldSize < 5) {
-            throw new IllegalArgumentException("Размер поля должен быть не менее 5");
+            throw new IllegalArgumentException("The field size should be at least 5");
         }
 
         if (fieldSize <= 100) {

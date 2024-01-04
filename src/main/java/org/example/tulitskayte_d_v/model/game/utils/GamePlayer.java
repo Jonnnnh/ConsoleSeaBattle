@@ -66,9 +66,9 @@ public class GamePlayer {
 
     private GamePhase checkAndHandleUndoOption(Player firstPlayer, Player secondPlayer, GamePhase state, GameHistory gameHistory, Scanner sc) {
         while (gameHistory.canUndo()) {
-            System.out.println("Желаете отменить ход? (да/нет)");
+            System.out.println("Do you wish to cancel the move? (yes/enter)");
             String response = sc.nextLine();
-            if (response.equalsIgnoreCase("да")) {
+            if (response.equalsIgnoreCase("yes")) {
                 GameState prevState = gameHistory.undo();
                 if (prevState != null) {
                     restoreGameState(prevState, firstPlayer, secondPlayer);
@@ -83,7 +83,7 @@ public class GamePlayer {
     }
 
     private int promptForFieldSize(Scanner sc) {
-        System.out.println("Введите размер поля (минимум 5):");
+        System.out.println("Enter the field size (minimum 5):");
         int size;
         while (true) {
             if (sc.hasNextInt()) {
@@ -92,10 +92,10 @@ public class GamePlayer {
                 if (size >= 5) {
                     break;
                 } else {
-                    System.out.println("Размер поля должен быть не меньше 5. Пожалуйста, попробуйте снова:");
+                    System.out.println("The field size must be at least 5. Please try again:");
                 }
             } else {
-                System.out.println("Неверный ввод. Пожалуйста, введите число.");
+                System.out.println("Invalid entry. Please enter a number.");
                 sc.next();
                 sc.nextLine();
             }
@@ -121,7 +121,7 @@ public class GamePlayer {
             coordinate = player.getStrategy().makeMove(enemy.getBattleField());
             isValidMove = isValidMove(coordinate, enemy);
             if (!isValidMove) {
-                System.out.println("Неверный ход. Пожалуйста, выберите другие координаты.");
+                System.out.println("Wrong move. Please select other coordinates.");
             }
         } while (!isValidMove);
         HitResults resultOfMove = enemy.move(coordinate);
@@ -134,7 +134,7 @@ public class GamePlayer {
     }
 
     public Player initializePlayer(Scanner sc, String playerLabel) {
-        System.out.printf("\n%s, введите 0, если хотите, чтобы вашу игру вел бот.\n", playerLabel);
+        System.out.printf("\n%s, enter 0 if you want your game to be run by a bot.\n", playerLabel);
         String input = sc.nextLine();
         GameStrategy strategy;
         String playerName;
@@ -144,7 +144,7 @@ public class GamePlayer {
             playerName = "Bot" + botCounter;
             strategy = chooseBotStrategy(); // выбор стратегии для бота
         } else {
-            System.out.printf("\n%s, введите свое имя:\n", playerLabel);
+            System.out.printf("\n%s, enter your name:\n", playerLabel);
             playerName = sc.nextLine();
             strategy = new HumanStrategy();
         }
@@ -163,17 +163,17 @@ public class GamePlayer {
         while (!shipsArranged) {
             try {
                 if (!player.getStrategy().isBot()) {
-                    gameDisplay.arrangeHint(player.getName(), fieldSize);
+                    HumanStrategy.arrangeHint(player.getName(), fieldSize);
                 }
                 ArrayList<Ship> ships = new ArrayList<>();
                 player.getStrategy().placeShips(new BattleField(fieldSize, ships), ships);
                 player.setBattleField(new BattleField(fieldSize, ships));
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
-                System.out.println("Ошибка: " + e.getMessage());
-                System.out.println("Пожалуйста, попробуйте еще раз.");
+                System.out.println("Error: " + e.getMessage());
+                System.out.println("Please try again.");
             } catch (Exception e) {
-                System.out.println("Произошла неожиданная ошибка: " + e.getMessage());
+                System.out.println("There was an unexpected error: " + e.getMessage());
             }
         }
     }

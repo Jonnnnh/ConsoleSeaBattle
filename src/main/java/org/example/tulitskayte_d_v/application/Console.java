@@ -15,8 +15,8 @@ public class Console {
         //a1-a4, d5-d8, h7-h10, l3-n3, l5-n5, l8-n8, l11-n11, l13-m13, l15-m15, l17-m17, l19-m19, l21-m21, r2-r2, r4-r4, r6-r6, r8-r8, r10-r10, r12-r12, r14-r14, r16-r16, r18-r18, r20-r20, r22-r22, r24-r24, u2-u2
         GamePlayer game = new GamePlayer();
 
-        Player firstPlayer = game.initializePlayer(sc, "Первый игрок");
-        Player secondPlayer = game.initializePlayer(sc, "Второй игрок");
+        Player firstPlayer = game.initializePlayer(sc, "First player");
+        Player secondPlayer = game.initializePlayer(sc, "Second player");
 
         game.startGame(firstPlayer, secondPlayer);
     }

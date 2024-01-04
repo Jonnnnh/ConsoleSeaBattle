@@ -25,11 +25,11 @@ public class GameDisplay {
 
     private void printFieldTitle(String currentPlayerName, String enemyPlayerName, int size) {
         int totalFieldWidth = size * 4;
-        int totalTitleLength = currentPlayerName.length() + " Ваше поле: ".length() + enemyPlayerName.length() + " Вражеское поле:".length();
+        int totalTitleLength = currentPlayerName.length() + " Your field: ".length() + enemyPlayerName.length() + " Enemy field:".length();
         int spacesCount = totalFieldWidth - totalTitleLength + 30;
         String spaces = new String(new char[spacesCount]).replace("\0", " ");
-        System.out.println(TextHelper.ANSI_GREEN_BACKGROUND + currentPlayerName + " Ваше поле: " + TextHelper.ANSI_RESET
-                + spaces + TextHelper.ANSI_RED_BACKGROUND + enemyPlayerName + " Вражеское поле:" + TextHelper.ANSI_RESET);
+        System.out.println(TextHelper.ANSI_GREEN_BACKGROUND + currentPlayerName + " Your field: " + TextHelper.ANSI_RESET
+                + spaces + TextHelper.ANSI_RED_BACKGROUND + enemyPlayerName + " Enemy field:" + TextHelper.ANSI_RESET);
     }
 
     private void printFieldHeaders(int size) {
@@ -89,24 +89,11 @@ public class GameDisplay {
         }
     }
 
-    public void arrangeHint(String name, int size) {
-        String hint = createShipHint(FieldCalculator.calculateShipCounts(size));
-        printShipArrangementInstructions(name, hint, size);
-    }
 
-    private void printShipArrangementInstructions(String playerName, String hint, int fieldSize) {
-        String lastColumnHeader = CoordinateHelper.numberCoordinateToLetter(fieldSize - 1);
-        System.out.printf("""
-                        %s, расставьте корабли следующим образом: %s.
-                        Каждый корабль должен иметь координаты X (A-%s) и Y (1-%d) в зависимости от размера поля.
-                        """,
-                playerName, hint, lastColumnHeader, fieldSize);
-    }
-
-    private String createShipHint(int[] shipCounts) {
+    public static String createShipHint(int[] shipCounts) {
         StringBuilder hint = new StringBuilder();
         for (int i = shipCounts.length - 1; i >= 0; i--) {
-            hint.append(shipCounts[i]).append("x").append(i + 1).append("-палубный");
+            hint.append(shipCounts[i]).append("x").append(i + 1).append("-deck");
             if (i > 0) {
                 hint.append(i > 1 ? ", " : " и ");
             }
@@ -114,22 +101,22 @@ public class GameDisplay {
         return hint.toString();
     }
 
-    public void processMoveResult(HitResults resultOfMove, Player player) { // TODO: проблема с пробелами и печатью
+    public void processMoveResult(HitResults resultOfMove, Player player) {
         switch (resultOfMove) {
             case MISS:
-                System.out.printf(TextHelper.ANSI_RED + "\n%s, Вы не попали!\n" + TextHelper.ANSI_RESET, player.getName());
+                System.out.printf(TextHelper.ANSI_RED + "\n%s, You didn't get!\n" + TextHelper.ANSI_RESET, player.getName());
                 break;
             case HURT:
             case KILLED:
-                System.out.printf(TextHelper.ANSI_GREEN + "\n%s, Вы попали!%s\n" + TextHelper.ANSI_RESET, player.getName(), resultOfMove == HitResults.KILLED ? " И затопили корабль!" : "");
+                System.out.printf(TextHelper.ANSI_GREEN + "\n%s, You're in!%s\n" + TextHelper.ANSI_RESET, player.getName(), resultOfMove == HitResults.KILLED ? " И затопили корабль!" : "");
                 break;
             default:
-                System.out.printf(TextHelper.ANSI_RED + "\n%s, Выстрела не было.\n" + TextHelper.ANSI_RESET, player.getName());
+                System.out.printf(TextHelper.ANSI_RED + "\n%s, There was no gunshot.\n" + TextHelper.ANSI_RESET, player.getName());
                 break;
         }
     }
 
     public void printWinner(String name) {
-        System.out.printf(TextHelper.ANSI_GREEN + "Поздравляю с победой, %s. Игра окончена!\n" + TextHelper.ANSI_RESET, name);
+        System.out.printf(TextHelper.ANSI_GREEN + "Congratulations on the win, %s. Game over!\n" + TextHelper.ANSI_RESET, name);
     }
 }

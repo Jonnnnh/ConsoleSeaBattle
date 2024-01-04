@@ -15,7 +15,7 @@ public class GameUtils {
         String[] splitShips = data.split(",\\s*");
 
         if (splitShips.length != expectedNumberOfShips) {
-            throw new IllegalArgumentException("Необходимо расставить " + expectedNumberOfShips + " кораблей. Ваш ввод: " + data);
+            throw new IllegalArgumentException("We need to set up " + expectedNumberOfShips + " ships. Your input: " + data);
         }
 
         for (String shipCoords : splitShips) {
@@ -29,7 +29,7 @@ public class GameUtils {
     private static Ship createShipFromCoords(String shipCoords) {
         String[] coords = shipCoords.split("-");
         if (coords.length != 2) {
-            throw new IllegalArgumentException("Неверный формат координат корабля: " + shipCoords);
+            throw new IllegalArgumentException("Incorrect ship coordinate format: " + shipCoords);
         }
 
         Coordinate start = CoordinateParser.getCoordinate(coords[0]);
@@ -58,18 +58,18 @@ public class GameUtils {
         for (Ship ship : ships) {
             int decks = ship.getDecks().size();
             if (decks < 1 || decks > 4) {
-                throw new IllegalStateException("Найден неверный корабль с количеством палуб: " + decks);
+                throw new IllegalStateException("Found the wrong ship with the number of decks: " + decks);
             }
             countByDecks[decks - 1]++;
         }
         if (fieldSize == 5) {
             if (countByDecks[2] > 0 || countByDecks[3] > 0) {
-                throw new IllegalStateException("На поле размером 5x5 не должно быть трехпалубных или четырехпалубных кораблей.");
+                throw new IllegalStateException("A 5x5 field may not contain three-deck or four-deck ships.");
             }
         }
         for (int i = 0; i < countByDecks.length; i++) {
             if (countByDecks[i] != expectedCounts[i]) {
-                throw new IllegalStateException("Неверное количество " + (i + 1) + "-палубных кораблей: ожидалось " + expectedCounts[i] + ", найдено " + countByDecks[i]);
+                throw new IllegalStateException("Wrong number " + (i + 1) + "-of deck ships: expected " + expectedCounts[i] + ", found " + countByDecks[i]);
             }
         }
 
@@ -83,7 +83,7 @@ public class GameUtils {
                     for (ShipDeck deck2 : ships.get(j).getDecks()) {
                         if (Math.abs(deck1.getRow() - deck2.getRow()) <= 1 &&
                                 Math.abs(deck1.getColumn() - deck2.getColumn()) <= 1) {
-                            throw new IllegalStateException("Корабли перекрывают друг друга. Корабль 1: " + ships.get(i) + ", Корабль 2: " + ships.get(j));
+                            throw new IllegalStateException("The ships overlap each other. Ship 1: " + ships.get(i) + ", Ship 2: " + ships.get(j));
                         }
                     }
                 }
