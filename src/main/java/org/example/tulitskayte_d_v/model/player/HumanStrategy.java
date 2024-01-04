@@ -6,7 +6,6 @@ import org.example.tulitskayte_d_v.model.game.utils.CoordinateParser;
 import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.GameUtils;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
-import org.example.tulitskayte_d_v.model.player.GameStrategy;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.view.GameDisplay;
 

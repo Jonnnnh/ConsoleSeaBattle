@@ -29,10 +29,10 @@ public class FieldCalculator {
             shipCounts[2] = calculateThreeDeckShipCount(fieldSize);
             shipCounts[3] = calculateFourDeckShipCount(fieldSize);
         } else {
-            shipCounts[0] = calculateExtrapolatedValue(fieldSize, fieldSizes, oneDeckShipCounts);
-            shipCounts[1] = calculateExtrapolatedValue(fieldSize, fieldSizes, twoDeckShipCounts);
-            shipCounts[2] = calculateExtrapolatedValue(fieldSize, fieldSizes, threeDeckShipCounts);
-            shipCounts[3] = calculateExtrapolatedValue(fieldSize, fieldSizes, fourDeckShipCounts);
+            shipCounts[0] = calculateExtrapolatedValue(fieldSize, oneDeckShipCounts);
+            shipCounts[1] = calculateExtrapolatedValue(fieldSize, twoDeckShipCounts);
+            shipCounts[2] = calculateExtrapolatedValue(fieldSize, threeDeckShipCounts);
+            shipCounts[3] = calculateExtrapolatedValue(fieldSize, fourDeckShipCounts);
         }
 
         return shipCounts;
@@ -57,18 +57,16 @@ public class FieldCalculator {
     }
 
     private static int calculateFourDeckShipCount(int fieldSize) {
-        double[] x = fieldSizes;
-        double[] y = fourDeckShipCounts;
         SplineInterpolator interpolator = new SplineInterpolator();
-        PolynomialSplineFunction splineFunction = interpolator.interpolate(x, y);
+        PolynomialSplineFunction splineFunction = interpolator.interpolate(fieldSizes, fourDeckShipCounts);
         return (int) splineFunction.value(fieldSize);
     }
 
-    private static int calculateExtrapolatedValue(int fieldSize, double[] sizes, double[] counts) {
-        int lastIdx = sizes.length - 1;
-        double x1 = sizes[lastIdx - 1];
+    private static int calculateExtrapolatedValue(int fieldSize, double[] counts) {
+        int lastIdx = FieldCalculator.fieldSizes.length - 1;
+        double x1 = FieldCalculator.fieldSizes[lastIdx - 1];
         double y1 = counts[lastIdx - 1];
-        double x2 = sizes[lastIdx];
+        double x2 = FieldCalculator.fieldSizes[lastIdx];
         double y2 = counts[lastIdx];
 
         double slope = (y2 - y1) / (x2 - x1);

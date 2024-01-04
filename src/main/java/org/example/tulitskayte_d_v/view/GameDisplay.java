@@ -3,7 +3,6 @@ package org.example.tulitskayte_d_v.view;
 import org.example.tulitskayte_d_v.cell.Cell;
 import org.example.tulitskayte_d_v.cell.CellStates;
 import org.example.tulitskayte_d_v.controller.BattleField;
-import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.TextHelper;
 import org.example.tulitskayte_d_v.model.player.Player;
@@ -108,7 +107,7 @@ public class GameDisplay {
                 break;
             case HURT:
             case KILLED:
-                System.out.printf(TextHelper.ANSI_GREEN + "\n%s, You're in!%s\n" + TextHelper.ANSI_RESET, player.getName(), resultOfMove == HitResults.KILLED ? " И затопили корабль!" : "");
+                System.out.printf(TextHelper.ANSI_GREEN + "\n%s, You're in!%s\n" + TextHelper.ANSI_RESET, player.getName(), resultOfMove == HitResults.KILLED ? " And they sank the ship!" : "");
                 break;
             default:
                 System.out.printf(TextHelper.ANSI_RED + "\n%s, There was no gunshot.\n" + TextHelper.ANSI_RESET, player.getName());

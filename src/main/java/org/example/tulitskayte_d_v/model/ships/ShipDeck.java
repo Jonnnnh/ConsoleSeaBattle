@@ -22,10 +22,6 @@ public class ShipDeck {
         return column;
     }
 
-    private void setState(DeckConditions state) {
-        this.state = state;
-    }
-
     public DeckConditions getState() {
         return state;
     }

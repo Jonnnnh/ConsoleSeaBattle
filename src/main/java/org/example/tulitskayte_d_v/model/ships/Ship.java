@@ -32,10 +32,6 @@ public class Ship {
         return new ArrayList<>(shipDecks);
     }
 
-    private void setState(ShipStates state) {
-        this.state = state;
-    }
-
     public ShipStates getState() {
         return state;
     }

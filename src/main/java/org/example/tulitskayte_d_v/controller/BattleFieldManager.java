@@ -12,13 +12,12 @@ import java.util.List;
 
 public class BattleFieldManager {
 
-    private BattleField battleField;
+    private final BattleField battleField;
 
     public BattleFieldManager(int size, List<Ship> ships) {
         this.battleField = new BattleField(size, ships);
     }
 
-    // обеспечивает безопасный и контролируемый доступ к функционалу поля битвы
     public HitResults hitBattleField(Coordinate coordinate) {
         if (!battleField.isValidMove(coordinate)) {
             throw new IllegalStateException("Invalid move");
@@ -26,12 +25,10 @@ public class BattleFieldManager {
         return battleField.hitBattleField(coordinate);
     }
 
-    // метод для установки кораблей
     public void arrangeShips(List<Ship> ships) {
         battleField.arrangeTheShips(ships);
     }
 
-    // возвращает копию данных, предотвращая непосредственное изменение внутреннего состояния
     public Cell[][] getCells() {
         return battleField.copyCells();
     }
@@ -42,5 +39,15 @@ public class BattleFieldManager {
 
     public int getSize() {
         return battleField.getSize();
+    }
+
+    public List<Ship> getShips() {
+        return battleField.getShips();
+    }
+    public ShipDeck getShip(int row, int column) {
+        return battleField.getShip(row, column);
+    }
+    public boolean isValidMove(Coordinate coordinate) {
+        return battleField.isValidMove(coordinate);
     }
 }
