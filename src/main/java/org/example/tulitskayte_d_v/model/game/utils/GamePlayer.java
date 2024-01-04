@@ -131,20 +131,19 @@ public class GamePlayer {
     public Player initializePlayer(Scanner sc, String playerLabel) {
         System.out.printf("\n%s, enter 0 if you want your game to be run by a bot.\n", playerLabel);
         String input = sc.nextLine();
-        GameStrategy strategy;
-        String playerName;
+        PlayerBuilder builder = new PlayerBuilder();
 
         if (Objects.equals(input, "0")) {
             botCounter++;
-            playerName = "Bot" + botCounter;
-            strategy = new BotGeniusStrategy();
+            String botName = "Bot" + botCounter;
+            builder.setName(botName).setStrategy(new BotGeniusStrategy());
         } else {
             System.out.printf("\n%s, enter your name:\n", playerLabel);
-            playerName = sc.nextLine();
-            strategy = new HumanStrategy();
+            String playerName = sc.nextLine();
+            builder.setName(playerName).setStrategy(new HumanStrategy());
         }
 
-        return new Player(playerName, strategy);
+        return builder.build();
     }
 
     public void setupPlayerShips(Scanner sc, Player player) {
@@ -156,7 +155,7 @@ public class GamePlayer {
                 }
                 ArrayList<Ship> ships = new ArrayList<>();
                 player.getStrategy().placeShips(new BattleField(fieldSize, ships), ships);
-                player.setBattleField(new BattleField(fieldSize, ships));
+                player.setBattleField(new BattleField(fieldSize, ships)); // исправить
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
