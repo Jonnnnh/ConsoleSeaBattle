@@ -2,6 +2,9 @@ package org.example.tulitskayte_d_v.model.game.utils;
 
 
 import org.example.tulitskayte_d_v.controller.BattleField;
+import org.example.tulitskayte_d_v.model.commands.AttackCommand;
+import org.example.tulitskayte_d_v.model.commands.Command;
+import org.example.tulitskayte_d_v.model.commands.PlaceShipsCommand;
 import org.example.tulitskayte_d_v.model.player.*;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.history.GameHistory;
@@ -22,7 +25,9 @@ public class GamePlayer {
     public GamePlayer() {
         this.gameDisplay = new GameDisplay();
     }
-
+    public void executeCommand(Command command) {
+        command.execute();
+    }
     public void startGame(Player firstPlayer, Player secondPlayer) {
         Scanner sc = new Scanner(System.in);
         fieldSize = promptForFieldSize(sc);
@@ -119,8 +124,13 @@ public class GamePlayer {
                 System.out.println("Wrong move. Please select other coordinates.");
             }
         } while (!isValidMove);
+
+        Command attackCommand = new AttackCommand(enemy.getBattleField(), coordinate);
+        executeCommand(attackCommand);
+
         HitResults resultOfMove = enemy.move(coordinate);
         gameDisplay.processMoveResult(resultOfMove, player);
+
         return updateGameState(resultOfMove, state, player, enemy);
     }
 
@@ -153,9 +163,14 @@ public class GamePlayer {
                 if (player.getStrategy() instanceof HumanStrategy) {
                     HumanStrategy.arrangeHint(player.getName(), fieldSize);
                 }
+
                 ArrayList<Ship> ships = new ArrayList<>();
                 player.getStrategy().placeShips(new BattleField(fieldSize, ships), ships);
                 player.setBattleField(new BattleField(fieldSize, ships)); // исправить
+
+                Command placeShipsCommand = new PlaceShipsCommand(player.getBattleField(), ships);
+                executeCommand(placeShipsCommand);
+
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
@@ -165,6 +180,7 @@ public class GamePlayer {
             }
         }
     }
+
 
     public GamePhase updateGameState(HitResults resultOfMove, GamePhase state, Player player, Player enemy) {
         if (enemy.getBattleField().isEnemyLose()) {
