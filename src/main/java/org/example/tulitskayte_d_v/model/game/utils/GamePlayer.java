@@ -104,7 +104,8 @@ public class GamePlayer {
     }
 
     private boolean isBotGame(Player firstPlayer, Player secondPlayer) {
-        return firstPlayer.getStrategy().isBot() && secondPlayer.getStrategy().isBot();
+        return firstPlayer.getStrategy() instanceof BotGeniusStrategy &&
+                secondPlayer.getStrategy() instanceof BotGeniusStrategy;
     }
 
 
@@ -156,7 +157,7 @@ public class GamePlayer {
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
-                if (!player.getStrategy().isBot()) {
+                if (player.getStrategy() instanceof HumanStrategy) {
                     HumanStrategy.arrangeHint(player.getName(), fieldSize);
                 }
                 ArrayList<Ship> ships = new ArrayList<>();

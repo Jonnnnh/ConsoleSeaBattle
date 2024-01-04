@@ -14,11 +14,6 @@ public class BotGeniusStrategy implements GameStrategy {
     }
 
     @Override
-    public boolean isBot() {
-        return true;
-    }
-
-    @Override
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
         String shipPlacement = BotGenius.generateBotShipPlacement(battleField.getSize());
         List<Ship> generatedShips = GameUtils.convertStringToShips(battleField.getSize(), shipPlacement);

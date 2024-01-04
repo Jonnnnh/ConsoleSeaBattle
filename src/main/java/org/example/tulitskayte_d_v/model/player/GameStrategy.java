@@ -7,7 +7,6 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.ArrayList;
 
 public interface GameStrategy {
-    boolean isBot();
     void placeShips(BattleField battleField, ArrayList<Ship> ships);
     Coordinate makeMove(BattleField enemyBattleField);
 }
