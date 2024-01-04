@@ -8,7 +8,6 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class BotGeniusStrategy implements GameStrategy {
     public BotGeniusStrategy() {
     }
