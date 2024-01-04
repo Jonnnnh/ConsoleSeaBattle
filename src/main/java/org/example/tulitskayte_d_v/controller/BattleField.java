@@ -158,4 +158,13 @@ public class BattleField {
         }
         return clonedBattleField;
     }
+    public Cell[][] copyCells() {
+        Cell[][] copiedCells = new Cell[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                copiedCells[i][j] = cells[i][j].deepCopy();
+            }
+        }
+        return copiedCells;
+    }
 }

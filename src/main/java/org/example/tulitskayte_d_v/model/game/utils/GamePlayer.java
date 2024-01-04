@@ -103,12 +103,6 @@ public class GamePlayer {
         return size;
     }
 
-    private boolean isBotGame(Player firstPlayer, Player secondPlayer) {
-        return firstPlayer.getStrategy() instanceof BotGeniusStrategy &&
-                secondPlayer.getStrategy() instanceof BotGeniusStrategy;
-    }
-
-
     private GamePhase restoreGameState(GameState gameState, Player firstPlayer, Player secondPlayer) {
         firstPlayer.setBattleField(gameState.getBattleFieldPlayer1().deepCopy()); // восстановление состояния игровых полей
         secondPlayer.setBattleField(gameState.getBattleFieldPlayer2().deepCopy());
