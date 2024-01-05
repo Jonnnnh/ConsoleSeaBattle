@@ -23,7 +23,7 @@ public class BattleField {
         arrangeTheShips(ships);
     }
 
-    public void arrangeTheShips(List<Ship> ships) {
+    public void arrangeTheShips(List<Ship> ships) { // желательно ограничить доступ
         this.ships = ships;
         for (Ship s : ships) {
             for (int i = 0; i < s.getDecks().size(); i++) {
