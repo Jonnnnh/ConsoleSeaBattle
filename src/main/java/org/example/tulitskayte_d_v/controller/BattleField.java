@@ -14,15 +14,19 @@ import java.util.List;
 public class BattleField {
     public int size;
     protected Cell[][] cells;
+    protected Cell[][] shotCells;
     protected List<Ship> ships;
 
     public BattleField(int size, List<Ship> ships) {
         this.size = size;
         this.cells = new Cell[size][size];
-        createEmptyBattleField();
+        this.shotCells = new Cell[size][size];
+        createEmptyCells(this.cells);
+        createEmptyCells(this.shotCells);
         arrangeTheShips(ships);
     }
 
+    // используем матрицу ячеек для расстановки кораблей
     public void arrangeTheShips(List<Ship> ships) {
         this.ships = ships;
         for (Ship s : ships) {
@@ -35,7 +39,7 @@ public class BattleField {
         }
     }
 
-    public void createEmptyBattleField() {
+    private void createEmptyCells(Cell[][] cells) {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 cells[i][j] = new Cell(i, j, false);
@@ -64,12 +68,13 @@ public class BattleField {
     }
 
     public HitResults hitBattleField(Coordinate coordinate) {
-        cells[coordinate.getRow()][coordinate.getColumn()].setState(CellStates.CHECKED);
+        shotCells[coordinate.getRow()][coordinate.getColumn()].setState(CellStates.CHECKED);
+
         for (Ship ship : ships) {
             for (ShipDeck shipDeck : ship.getDecks()) {
                 if (shipDeck.getRow() == coordinate.getRow() && shipDeck.getColumn() == coordinate.getColumn()) {
                     ShipStates shipState = ship.hitTheShip(coordinate);
-                    this.getCells()[coordinate.getRow()][coordinate.getColumn()].setShipHere();
+
                     if (shipState == ShipStates.KILLED) {
                         killTheShip(ship);
                         return HitResults.KILLED;
@@ -92,17 +97,14 @@ public class BattleField {
     public boolean isValidMove(Coordinate coordinate) {
         int row = coordinate.getRow();
         int column = coordinate.getColumn();
-        if (row < 0 || row >= getSize() || column < 0 || column >= getSize()) {
-            return false;
-        }
-        return getCells()[row][column].getState() != CellStates.CHECKED;
+        return isWithinBounds(row, column) && shotCells[row][column].getState() != CellStates.CHECKED;
     }
 
     private void makeChecked(int row, int column) {
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = column - 1; j <= column + 1; j++) {
                 if (isWithinBounds(i, j)) {
-                    getCells()[i][j].setState(CellStates.CHECKED);
+                    shotCells[i][j].setState(CellStates.CHECKED);
                 }
             }
         }
@@ -116,6 +118,9 @@ public class BattleField {
         return cells;
     }
 
+    public Cell[][] getShotCells() {
+        return shotCells;
+    }
     public List<Ship> getShips() {
         return ships;
     }
@@ -150,20 +155,17 @@ public class BattleField {
             clonedShips.add(ship.deepCopy());
         }
 
-        BattleField clonedBattleField = new BattleField(getSize(), clonedShips);
-        for (int i = 0; i < this.cells.length; i++) {
-            for (int j = 0; j < this.cells[i].length; j++) {
-                clonedBattleField.getCells()[i][j] = this.cells[i][j].deepCopy();
-            }
-        }
+        BattleField clonedBattleField = new BattleField(this.size, clonedShips);
+        clonedBattleField.cells = copyCells(this.cells);
+        clonedBattleField.shotCells = copyCells(this.shotCells);
         return clonedBattleField;
     }
 
-    public Cell[][] copyCells() {
+    private Cell[][] copyCells(Cell[][] sourceCells) {
         Cell[][] copiedCells = new Cell[size][size];
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                copiedCells[i][j] = cells[i][j].deepCopy();
+                copiedCells[i][j] = sourceCells[i][j].deepCopy();
             }
         }
         return copiedCells;

@@ -72,24 +72,32 @@ public class GameDisplay implements PlayerActionListener {
     }
 
     private String getCellSymbol(BattleField battleField, int row, int col, boolean isPlayerField) {
-        Cell cell = battleField.getCells()[row][col];
-        if (cell.isThereAShip()) {
-            if (isPlayerField || battleField.getShip(row, col).getEnemyState() == OpponentDeckConditions.VISIBLE) {
-                if (cell.getState() == CellStates.CHECKED) {
+        Cell shipCell = battleField.getCells()[row][col];
+        Cell shotCell = battleField.getShotCells()[row][col];
+
+        if (isPlayerField) {
+            if (shipCell.isThereAShip()) {
+                if (shotCell.getState() == CellStates.CHECKED) {
                     return TextHelper.ANSI_RED_BACKGROUND + "X" + TextHelper.ANSI_RESET;
                 } else {
-                    return TextHelper.ANSI_RED + "X" + TextHelper.ANSI_RESET;
+                    return TextHelper.ANSI_GREEN + "X" + TextHelper.ANSI_RESET;
                 }
             } else {
-                return TextHelper.ANSI_BLUE + "~" + TextHelper.ANSI_RESET;
+                if (shotCell.getState() == CellStates.CHECKED) {
+                    return TextHelper.ANSI_BLACK + "O" + TextHelper.ANSI_RESET;
+                }
             }
-        } else if (cell.getState() == CellStates.CHECKED) {
-            return TextHelper.ANSI_BLACK + "О" + TextHelper.ANSI_RESET;
         } else {
-            return TextHelper.ANSI_BLUE + "~" + TextHelper.ANSI_RESET;
+            if (shotCell.getState() == CellStates.CHECKED) {
+                if (shipCell.isThereAShip()) {
+                    return TextHelper.ANSI_RED_BACKGROUND + "X" + TextHelper.ANSI_RESET;
+                } else {
+                    return TextHelper.ANSI_BLACK + "O" + TextHelper.ANSI_RESET;
+                }
+            }
         }
+        return TextHelper.ANSI_BLUE + "~" + TextHelper.ANSI_RESET;
     }
-
 
     public static String createShipHint(int[] shipCounts) {
         StringBuilder hint = new StringBuilder();

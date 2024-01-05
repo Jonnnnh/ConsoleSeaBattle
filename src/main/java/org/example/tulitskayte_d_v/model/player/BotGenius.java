@@ -176,10 +176,11 @@ public class BotGenius {
         return adjacentCoordinates;
     }
 
+    // обновленный метод, который проверяет матриц выстрелов, а не матрицу клеток, и будет атаковать, только в те, в которые ранее не стрелял
     protected static boolean isCoordinateValidForAttack(int row, int col, BattleField enemyBattleField) {
         int size = enemyBattleField.getSize();
         return row >= 0 && row < size && col >= 0 && col < size &&
-                enemyBattleField.getCells()[row][col].getState() == CellStates.EMPTY;
+                enemyBattleField.getShotCells()[row][col].getState() == CellStates.EMPTY;
     }
 
     protected static boolean isCoordinateValidForAttack(Coordinate coordinate, BattleField enemyBattleField) {
@@ -202,5 +203,4 @@ public class BotGenius {
         Random rnd = new Random();
         return targets.get(rnd.nextInt(targets.size()));
     }
-
 }
