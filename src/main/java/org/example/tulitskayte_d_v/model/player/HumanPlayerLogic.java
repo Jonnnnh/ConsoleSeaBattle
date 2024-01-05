@@ -6,7 +6,6 @@ import org.example.tulitskayte_d_v.model.game.utils.CoordinateParser;
 import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.GameUtils;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
-import org.example.tulitskayte_d_v.model.player.GameStrategy;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.view.GameDisplay;
 
@@ -14,16 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class HumanStrategy implements GameStrategy {
+public class HumanPlayerLogic implements PlayerLogic{
     private final Scanner scanner;
 
-    public HumanStrategy() {
+
+    public HumanPlayerLogic() {
         this.scanner = new Scanner(System.in);
     }
 
-
     @Override
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
+        // вызвать подсказку
         while (true) {
             try {
                 System.out.println("\nEnter the location of the ships (e.g. g1-g2, D1-D4):");
@@ -59,17 +59,5 @@ public class HumanStrategy implements GameStrategy {
         int row = coordinate.getRow();
         int col = coordinate.getColumn();
         return row >= 0 && row < battleField.getSize() && col >= 0 && col < battleField.getSize();
-    }
-    public static void arrangeHint(String name, int size) {
-        String hint = GameDisplay.createShipHint(FieldCalculator.calculateShipCounts(size));
-        printShipArrangementInstructions(name, hint, size);
-    }
-    private static void printShipArrangementInstructions(String playerName, String hint, int fieldSize) {
-        String lastColumnHeader = CoordinateHelper.numberCoordinateToLetter(fieldSize - 1);
-        System.out.printf("""
-                        %s, arrange your ships as follows: %s.
-                        Each ship must have coordinates X (A-%s) и Y (1-%d) depending on the field size.
-                        """,
-                playerName, hint, lastColumnHeader, fieldSize);
     }
 }

@@ -8,10 +8,7 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class BotGeniusStrategy implements GameStrategy {
-    public BotGeniusStrategy() {
-    }
+public class AIPlayerLogic implements PlayerLogic{
 
     @Override
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
@@ -25,5 +22,4 @@ public class BotGeniusStrategy implements GameStrategy {
     public Coordinate makeMove(BattleField enemyBattleField) {
         return BotGenius.calculateBotNextMove(enemyBattleField);
     }
-
 }

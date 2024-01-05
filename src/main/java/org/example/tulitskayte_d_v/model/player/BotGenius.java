@@ -155,11 +155,13 @@ public class BotGenius {
 
         return lineTargets;
     }
+
     private static void addTargetIfValid(List<Coordinate> lineTargets, int row, int col, BattleField enemyBattleField) {
         if (isCoordinateValidForAttack(row, col, enemyBattleField)) {
             lineTargets.add(new Coordinate(row, col));
         }
     }
+
     private static List<Coordinate> findAdjacentTargets(Coordinate coordinate, BattleField enemyBattleField) {
         List<Coordinate> adjacentCoordinates = new ArrayList<>();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};

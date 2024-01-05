@@ -7,11 +7,12 @@ import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.TextHelper;
 import org.example.tulitskayte_d_v.model.player.Player;
+import org.example.tulitskayte_d_v.model.player.PlayerActionListener;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.OpponentDeckConditions;
 
 
-public class GameDisplay {
+public class GameDisplay implements PlayerActionListener {
     public void printBothBattleFields(Player currentPlayer, Player enemyPlayer) {
         System.out.print("\n");
         BattleField currentPlayerBattleField = currentPlayer.getBattleField();
@@ -118,5 +119,20 @@ public class GameDisplay {
 
     public void printWinner(String name) {
         System.out.printf(TextHelper.ANSI_GREEN + "Congratulations on the win, %s. Game over!\n" + TextHelper.ANSI_RESET, name);
+    }
+
+    @Override
+    public void onArrangeShipsHint(String playerName, int fieldSize) {
+        String hint = GameDisplay.createShipHint(FieldCalculator.calculateShipCounts(fieldSize));
+        printShipArrangementInstructions(playerName, hint, fieldSize);
+    }
+
+    public static void printShipArrangementInstructions(String playerName, String hint, int fieldSize) {
+        String lastColumnHeader = CoordinateHelper.numberCoordinateToLetter(fieldSize - 1);
+        System.out.printf("""
+                        %s, arrange your ships as follows: %s.
+                        Each ship must have coordinates X (A-%s) и Y (1-%d) depending on the field size.
+                        """,
+                playerName, hint, lastColumnHeader, fieldSize);
     }
 }

@@ -8,32 +8,35 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.ArrayList;
 
 public class Player {
-    private final String name;
-    private BattleField battleField;
-    private final GameStrategy gameStrategy;
+    private final PlayerStorage storage;
+    private final PlayerLogic logic;
 
-    public Player(String name, GameStrategy gameStrategy) {
-        this.name = name;
-        this.gameStrategy = gameStrategy;
+    public Player(PlayerStorage storage, PlayerLogic logic) {
+        this.storage = storage;
+        this.logic = logic;
+    }
+    public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
+        logic.placeShips(battleField, ships);
+    }
+    public Coordinate makeMove(BattleField enemyBattleField) {
+        return logic.makeMove(enemyBattleField);
+    }
+    public String getName() {
+        return storage.getName();
     }
 
-    public void setBattleField(BattleField battleField) {
-        this.battleField = battleField;
+    public void setName(String name) {
+        storage.setName(name);
     }
 
     public BattleField getBattleField() {
-        return battleField;
+        return storage.getBattleField();
     }
 
-    public String getName() {
-        return name;
+    public void setBattleField(BattleField battleField) {
+        storage.setBattleField(battleField);
     }
-
-    public GameStrategy getStrategy() {
-        return gameStrategy;
-    }
-
     public HitResults move(Coordinate coordinate) {
-        return this.battleField.hitBattleField(coordinate);
+        return getBattleField().hitBattleField(coordinate);
     }
 }

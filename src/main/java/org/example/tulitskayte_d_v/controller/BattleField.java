@@ -158,6 +158,7 @@ public class BattleField {
         }
         return clonedBattleField;
     }
+
     public Cell[][] copyCells() {
         Cell[][] copiedCells = new Cell[size][size];
         for (int i = 0; i < size; i++) {

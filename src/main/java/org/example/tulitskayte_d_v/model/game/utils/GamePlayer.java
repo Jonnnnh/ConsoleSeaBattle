@@ -113,12 +113,13 @@ public class GamePlayer {
         Coordinate coordinate;
         boolean isValidMove;
         do {
-            coordinate = player.getStrategy().makeMove(enemy.getBattleField());
+            coordinate = player.makeMove(enemy.getBattleField());
             isValidMove = isValidMove(coordinate, enemy);
             if (!isValidMove) {
                 System.out.println("Wrong move. Please select other coordinates.");
             }
         } while (!isValidMove);
+
         HitResults resultOfMove = enemy.move(coordinate);
         gameDisplay.processMoveResult(resultOfMove, player);
         return updateGameState(resultOfMove, state, player, enemy);
@@ -136,13 +137,12 @@ public class GamePlayer {
         if (Objects.equals(input, "0")) {
             botCounter++;
             String botName = "Bot" + botCounter;
-            builder.setName(botName).setStrategy(new BotGeniusStrategy());
+            builder.setName(botName).setLogic(new AIPlayerLogic());
         } else {
             System.out.printf("\n%s, enter your name:\n", playerLabel);
             String playerName = sc.nextLine();
-            builder.setName(playerName).setStrategy(new HumanStrategy());
+            builder.setName(playerName).setLogic(new HumanPlayerLogic());
         }
-
         return builder.build();
     }
 
@@ -150,12 +150,9 @@ public class GamePlayer {
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
-                if (player.getStrategy() instanceof HumanStrategy) {
-                    HumanStrategy.arrangeHint(player.getName(), fieldSize);
-                }
                 ArrayList<Ship> ships = new ArrayList<>();
-                player.getStrategy().placeShips(new BattleField(fieldSize, ships), ships);
-                player.setBattleField(new BattleField(fieldSize, ships)); // исправить
+                player.placeShips(new BattleField(fieldSize, ships), ships);
+                player.setBattleField(new BattleField(fieldSize, ships));
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
