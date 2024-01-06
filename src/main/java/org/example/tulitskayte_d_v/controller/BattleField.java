@@ -1,7 +1,6 @@
 package org.example.tulitskayte_d_v.controller;
 
 import org.example.tulitskayte_d_v.cell.Cell;
-import org.example.tulitskayte_d_v.cell.CellStates;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
@@ -12,17 +11,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BattleField {
-    public int size;
-    protected Cell[][] cells;
-    protected Cell[][] shotCells;
-    protected List<Ship> ships;
+    private int size;
+    private Cell[][] cells;
+    private List<Ship> ships;
+    private ShotMatrix shotMatrix;
+    private Radar radar;
 
     public BattleField(int size, List<Ship> ships) {
         this.size = size;
         this.cells = new Cell[size][size];
-        this.shotCells = new Cell[size][size];
+        this.shotMatrix = new ShotMatrix(size);
+        this.radar = new Radar();
         createEmptyCells(this.cells);
-        createEmptyCells(this.shotCells);
         arrangeTheShips(ships);
     }
 
@@ -63,12 +63,13 @@ public class BattleField {
         return sb.toString();
     }
 
-    public boolean isThereAShip(int row, int column) {
+    boolean isThereAShip(int row, int column) {
         return cells[row][column].isThereAShip();
     }
 
     public HitResults hitBattleField(Coordinate coordinate) {
-        shotCells[coordinate.getRow()][coordinate.getColumn()].setState(CellStates.CHECKED);
+        shotMatrix.markShot(coordinate);
+        radar.updateLastShotCoordinate(coordinate);
 
         for (Ship ship : ships) {
             for (ShipDeck shipDeck : ship.getDecks()) {
@@ -95,22 +96,21 @@ public class BattleField {
     }
 
     public boolean isValidMove(Coordinate coordinate) {
-        int row = coordinate.getRow();
-        int column = coordinate.getColumn();
-        return isWithinBounds(row, column) && shotCells[row][column].getState() != CellStates.CHECKED;
+        return isWithinBounds(coordinate.getRow(), coordinate.getColumn())
+                && !shotMatrix.isShot(coordinate);
     }
 
     private void makeChecked(int row, int column) {
         for (int i = row - 1; i <= row + 1; i++) {
             for (int j = column - 1; j <= column + 1; j++) {
                 if (isWithinBounds(i, j)) {
-                    shotCells[i][j].setState(CellStates.CHECKED);
+                    shotMatrix.markShot(new Coordinate(i, j));
                 }
             }
         }
     }
 
-    private boolean isWithinBounds(int row, int column) {
+    boolean isWithinBounds(int row, int column) {
         return row >= 0 && row < getSize() && column >= 0 && column < getSize();
     }
 
@@ -119,8 +119,17 @@ public class BattleField {
     }
 
     public Cell[][] getShotCells() {
-        return shotCells;
+        return shotMatrix.getShotCells();
     }
+
+    public ShotMatrix getShotMatrix() {
+        return shotMatrix;
+    }
+
+    public Radar getRadar() {
+        return radar;
+    }
+
     public List<Ship> getShips() {
         return ships;
     }
@@ -157,7 +166,8 @@ public class BattleField {
 
         BattleField clonedBattleField = new BattleField(this.size, clonedShips);
         clonedBattleField.cells = copyCells(this.cells);
-        clonedBattleField.shotCells = copyCells(this.shotCells);
+        clonedBattleField.shotMatrix = this.shotMatrix.deepCopy();
+        clonedBattleField.radar = this.radar.deepCopy();
         return clonedBattleField;
     }
 

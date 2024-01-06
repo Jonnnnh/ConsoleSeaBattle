@@ -3,6 +3,8 @@ package org.example.tulitskayte_d_v.model.player;
 import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.GameUtils;
+import org.example.tulitskayte_d_v.model.player.bot.BotMoveSelector;
+import org.example.tulitskayte_d_v.model.player.bot.ShipPlacementGenerator;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ public class AIPlayerLogic implements PlayerLogic{
 
     @Override
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
-        String shipPlacement = BotGenius.generateBotShipPlacement(battleField.getSize());
+        String shipPlacement = ShipPlacementGenerator.generateBotShipPlacement(battleField.getSize());
         List<Ship> generatedShips = GameUtils.convertStringToShips(battleField.getSize(), shipPlacement);
         ships.addAll(generatedShips);
         battleField.arrangeTheShips(ships);
@@ -20,6 +22,6 @@ public class AIPlayerLogic implements PlayerLogic{
 
     @Override
     public Coordinate makeMove(BattleField enemyBattleField) {
-        return BotGenius.calculateBotNextMove(enemyBattleField);
+        return BotMoveSelector.calculateBotNextMove(enemyBattleField);
     }
 }

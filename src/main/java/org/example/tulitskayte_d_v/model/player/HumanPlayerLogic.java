@@ -3,11 +3,8 @@ package org.example.tulitskayte_d_v.model.player;
 import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.CoordinateParser;
-import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.GameUtils;
-import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
 import org.example.tulitskayte_d_v.model.ships.Ship;
-import org.example.tulitskayte_d_v.view.GameDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +20,6 @@ public class HumanPlayerLogic implements PlayerLogic{
 
     @Override
     public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
-        // вызвать подсказку
         while (true) {
             try {
                 System.out.println("\nEnter the location of the ships (e.g. g1-g2, D1-D4):");

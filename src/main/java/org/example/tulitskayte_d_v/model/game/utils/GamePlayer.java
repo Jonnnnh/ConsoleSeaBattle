@@ -151,6 +151,7 @@ public class GamePlayer {
         while (!shipsArranged) {
             try {
                 ArrayList<Ship> ships = new ArrayList<>();
+                gameDisplay.onArrangeShipsHint(player.getName(), fieldSize);
                 player.placeShips(new BattleField(fieldSize, ships), ships);
                 player.setBattleField(new BattleField(fieldSize, ships));
                 shipsArranged = true;

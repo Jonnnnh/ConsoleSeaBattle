@@ -7,12 +7,10 @@ import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.TextHelper;
 import org.example.tulitskayte_d_v.model.player.Player;
-import org.example.tulitskayte_d_v.model.player.PlayerActionListener;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
-import org.example.tulitskayte_d_v.model.ships.OpponentDeckConditions;
 
 
-public class GameDisplay implements PlayerActionListener {
+public class GameDisplay {
     public void printBothBattleFields(Player currentPlayer, Player enemyPlayer) {
         System.out.print("\n");
         BattleField currentPlayerBattleField = currentPlayer.getBattleField();
@@ -117,7 +115,7 @@ public class GameDisplay implements PlayerActionListener {
                 break;
             case HURT:
             case KILLED:
-                System.out.printf(TextHelper.ANSI_GREEN + "\n%s, You're in!%s\n" + TextHelper.ANSI_RESET, player.getName(), resultOfMove == HitResults.KILLED ? " И затопили корабль!" : "");
+                System.out.printf(TextHelper.ANSI_GREEN + "\n%s, You're in!%s\n" + TextHelper.ANSI_RESET, player.getName(), resultOfMove == HitResults.KILLED ? " And they sank the ship!" : "");
                 break;
             default:
                 System.out.printf(TextHelper.ANSI_RED + "\n%s, There was no gunshot.\n" + TextHelper.ANSI_RESET, player.getName());
@@ -129,9 +127,9 @@ public class GameDisplay implements PlayerActionListener {
         System.out.printf(TextHelper.ANSI_GREEN + "Congratulations on the win, %s. Game over!\n" + TextHelper.ANSI_RESET, name);
     }
 
-    @Override
     public void onArrangeShipsHint(String playerName, int fieldSize) {
         String hint = GameDisplay.createShipHint(FieldCalculator.calculateShipCounts(fieldSize));
+        System.out.println();
         printShipArrangementInstructions(playerName, hint, fieldSize);
     }
 
