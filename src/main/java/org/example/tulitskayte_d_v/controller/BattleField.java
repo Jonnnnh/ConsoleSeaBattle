@@ -27,7 +27,7 @@ public class BattleField {
     }
 
     // используем матрицу ячеек для расстановки кораблей
-    public void arrangeTheShips(List<Ship> ships) {
+     public void arrangeTheShips(List<Ship> ships) {
         this.ships = ships;
         for (Ship s : ships) {
             for (int i = 0; i < s.getDecks().size(); i++) {
@@ -134,7 +134,7 @@ public class BattleField {
         return ships;
     }
 
-    public boolean isEnemyLose() {
+    boolean isEnemyLose() {
         for (Ship s : ships) {
             if (s.getState() != ShipStates.KILLED) {
                 return false;

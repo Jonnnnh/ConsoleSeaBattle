@@ -113,7 +113,7 @@ public class GamePlayer {
         Coordinate coordinate;
         boolean isValidMove;
         do {
-            coordinate = player.makeMove(enemy.getBattleField());
+            coordinate = player.makeMove(); // makeMove(enemy.getBattleField())
             isValidMove = isValidMove(coordinate, enemy);
             if (!isValidMove) {
                 System.out.println("Wrong move. Please select other coordinates.");
@@ -146,14 +146,13 @@ public class GamePlayer {
         return builder.build();
     }
 
-    public void setupPlayerShips(Scanner sc, Player player) {
+    private void setupPlayerShips(Scanner sc, Player player) {
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
                 ArrayList<Ship> ships = new ArrayList<>();
                 gameDisplay.onArrangeShipsHint(player.getName(), fieldSize);
-                player.placeShips(new BattleField(fieldSize, ships), ships);
-                player.setBattleField(new BattleField(fieldSize, ships));
+                player.placeShips(ships);
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());

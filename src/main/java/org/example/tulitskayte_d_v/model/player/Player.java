@@ -1,6 +1,8 @@
 package org.example.tulitskayte_d_v.model.player;
 
 import org.example.tulitskayte_d_v.controller.BattleField;
+import org.example.tulitskayte_d_v.controller.MoveField;
+import org.example.tulitskayte_d_v.controller.ShipPlacementField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
@@ -15,11 +17,11 @@ public class Player {
         this.storage = storage;
         this.logic = logic;
     }
-    public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
-        logic.placeShips(battleField, ships);
+    public void placeShips(ArrayList<Ship> ships) {
+        logic.placeShips(storage.getShipPlacementField(), ships);
     }
-    public Coordinate makeMove(BattleField enemyBattleField) {
-        return logic.makeMove(enemyBattleField);
+    public Coordinate makeMove() {
+        return logic.makeMove(storage.getMoveField());
     }
     public String getName() {
         return storage.getName();
@@ -29,14 +31,14 @@ public class Player {
         storage.setName(name);
     }
 
-    public BattleField getBattleField() {
-        return storage.getBattleField();
+    public MoveField getBattleField() { // ?
+        return storage.getMoveField();
     }
 
-    public void setBattleField(BattleField battleField) {
-        storage.setBattleField(battleField);
+    public void setBattleField(MoveField battleField) { // ?
+        storage.setMoveField(battleField);
     }
     public HitResults move(Coordinate coordinate) {
-        return getBattleField().hitBattleField(coordinate);
+        return getBattleField().getHitResultAtCoordinate(coordinate);
     }
 }

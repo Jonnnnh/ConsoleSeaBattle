@@ -57,6 +57,18 @@ public class BattleFieldManager implements ShipPlacementField, MoveField {
     }
 
     @Override
+    public boolean isEnemyLose() {
+        return battleField.isEnemyLose();
+    }
+
+    @Override
+    public MoveField deepCopy() {
+        BattleField copiedBattleField = this.battleField.deepCopy();
+        Radar copiedRadar = this.radar.deepCopy();
+        return new BattleFieldManager(copiedBattleField, copiedRadar);
+    }
+
+    @Override
     public int getSize() {
         return battleField.getSize();
     }
