@@ -14,20 +14,18 @@ public class BattleField {
     private int size;
     private Cell[][] cells;
     private List<Ship> ships;
-    private ShotMatrix shotMatrix;
     private Radar radar;
 
     public BattleField(int size, List<Ship> ships) {
         this.size = size;
         this.cells = new Cell[size][size];
-        this.shotMatrix = new ShotMatrix(size);
         this.radar = new Radar();
         createEmptyCells(this.cells);
         arrangeTheShips(ships);
     }
 
     // используем матрицу ячеек для расстановки кораблей
-     public void arrangeTheShips(List<Ship> ships) {
+     void arrangeTheShips(List<Ship> ships) {
         this.ships = ships;
         for (Ship s : ships) {
             for (int i = 0; i < s.getDecks().size(); i++) {
@@ -67,7 +65,7 @@ public class BattleField {
         return cells[row][column].isThereAShip();
     }
 
-    public HitResults hitBattleField(Coordinate coordinate) {
+    HitResults hitBattleField(Coordinate coordinate) {
         shotMatrix.markShot(coordinate);
         radar.updateLastShotCoordinate(coordinate);
 

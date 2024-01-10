@@ -3,39 +3,34 @@ package org.example.tulitskayte_d_v.model.player;
 import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.controller.MoveField;
 import org.example.tulitskayte_d_v.controller.ShipPlacementField;
+import org.example.tulitskayte_d_v.controller.ShotMatrix;
 
 public class PlayerStorage {
     private String name;
-    private ShipPlacementField battleFieldManager;
-    private MoveField enemyBattleFieldManager;
+    private BattleField battleField;
 
-    public PlayerStorage(String name, ShipPlacementField battleFieldManager, MoveField enemyBattleFieldManager) {
-        this.name = name;
-        this.battleFieldManager = battleFieldManager;
-        this.enemyBattleFieldManager = enemyBattleFieldManager;
+    public void setShotMatrix(ShotMatrix shotMatrix) {
+        this.shotMatrix = shotMatrix;
+    }
+
+    private ShotMatrix shotMatrix;
+    public ShotMatrix getShotMatrix() {
+        return shotMatrix;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public void setBattleField(BattleField battleField) {
+        this.battleField = battleField;
+    }
+
     public String getName() {
         return name;
     }
 
-    public ShipPlacementField getShipPlacementField() {
-        return battleFieldManager;
-    }
-
-    public void setShipPlacementField(ShipPlacementField battleFieldManager) {
-        this.battleFieldManager = battleFieldManager;
-    }
-
-    public MoveField getMoveField() {
-        return enemyBattleFieldManager;
-    }
-
-    public void setMoveField(MoveField enemyBattleFieldManager) {
-        this.enemyBattleFieldManager = enemyBattleFieldManager;
+    public BattleField getBattleField() {
+        return battleField;
     }
 }

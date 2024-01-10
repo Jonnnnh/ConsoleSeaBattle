@@ -1,11 +1,12 @@
 package org.example.tulitskayte_d_v.model.game.utils;
 
 
-import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.model.player.*;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.history.GameHistory;
 import org.example.tulitskayte_d_v.model.game.utils.history.Move;
+import org.example.tulitskayte_d_v.model.player.strategy.AIPlayerLogic;
+import org.example.tulitskayte_d_v.model.player.strategy.HumanPlayerLogic;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.view.GameDisplay;

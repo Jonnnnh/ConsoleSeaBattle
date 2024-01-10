@@ -9,63 +9,11 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.List;
 
 
-public class BattleFieldManager implements ShipPlacementField, MoveField {
+public class BattleFieldManager implements ShipPlacementField {
     private final BattleField battleField;
-    private final Radar radar;
-    public BattleFieldManager(BattleField battleField, Radar radar) {
+
+    public BattleFieldManager(BattleField battleField) {
         this.battleField = battleField;
-        this.radar = radar;
-    }
-
-    @Override
-    public boolean isValidMove(Coordinate coordinate) {
-        return battleField.isValidMove(coordinate);
-    }
-
-    @Override
-    public CellStates getCellState(int row, int column) {
-        if (battleField.isWithinBounds(row, column)) {
-            return battleField.getShotMatrix().getShotCells()[row][column].getState();
-        }
-        return null;
-    }
-
-
-    @Override
-    public void updateLastShotCoordinate(Coordinate coordinate) {
-        radar.updateLastShotCoordinate(coordinate);
-    }
-
-    @Override
-    public Coordinate getLastShotCoordinate() {
-        return radar.getLastShotCoordinate();
-    }
-
-    @Override
-    public List<Ship> getShips() {
-        return battleField.getShips();
-    }
-
-    @Override
-    public Cell[][] getShotCells() {
-        return battleField.getShotMatrix().getShotCells();
-    }
-
-    @Override
-    public HitResults getHitResultAtCoordinate(Coordinate coordinate) {
-        return battleField.hitBattleField(coordinate);
-    }
-
-    @Override
-    public boolean isEnemyLose() {
-        return battleField.isEnemyLose();
-    }
-
-    @Override
-    public MoveField deepCopy() {
-        BattleField copiedBattleField = this.battleField.deepCopy();
-        Radar copiedRadar = this.radar.deepCopy();
-        return new BattleFieldManager(copiedBattleField, copiedRadar);
     }
 
     @Override
@@ -99,8 +47,12 @@ public class BattleFieldManager implements ShipPlacementField, MoveField {
     }
 
     @Override
-    public void arrangeShips(List<Ship> ships) {
-        battleField.arrangeTheShips(ships);
+    public void arrangeShips(List<Ship> ships) { // здесь мы просто запоминаем, но не ставим
+        battleField.arrangeTheShips(ships); // используем принцип накопителя, накапливаем действия, только потом ставим
+    }
+
+    public void fillField(BattleField bf) { // а здесь уже окончательно ставим
+
     }
 
     private boolean isCellAvailableForShip(int row, int col) {

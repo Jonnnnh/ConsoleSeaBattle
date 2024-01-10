@@ -1,6 +1,5 @@
-package org.example.tulitskayte_d_v.model.player;
+package org.example.tulitskayte_d_v.model.player.strategy;
 
-import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.controller.MoveField;
 import org.example.tulitskayte_d_v.controller.ShipPlacementField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
