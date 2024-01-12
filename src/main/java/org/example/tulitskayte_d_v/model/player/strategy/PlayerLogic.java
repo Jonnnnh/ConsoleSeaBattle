@@ -9,6 +9,6 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.ArrayList;
 
 public interface PlayerLogic {
-    void placeShips(ShipPlacementField shipPlacementField, ArrayList<Ship> ships);
+    void placeShips(ShipPlacementField bfManager, ArrayList<Ship> ships);
     Coordinate makeMove(MoveField enemyBattleFieldManager);
 }

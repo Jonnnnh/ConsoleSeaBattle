@@ -1,9 +1,6 @@
 package org.example.tulitskayte_d_v.model.player;
 
-import org.example.tulitskayte_d_v.controller.BattleField;
-import org.example.tulitskayte_d_v.controller.MoveField;
-import org.example.tulitskayte_d_v.controller.Radar;
-import org.example.tulitskayte_d_v.controller.ShotMatrix;
+import org.example.tulitskayte_d_v.controller.*;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.player.strategy.PlayerLogic;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
@@ -20,30 +17,50 @@ public class Player {
         this.storage = storage;
         this.logic = logic;
     }
+
     public void placeShips(ArrayList<Ship> ships) {
-        // bfManager здесь
-        logic.placeShips(storage.getShipPlacementField(), ships);
-        bf.fill(storage.getBattleField());
+        BattleFieldManager bfManager = new BattleFieldManager(storage.getBattleField());
+        logic.placeShips(bfManager, ships);
+
     }
-    public Coordinate makeMove(BattleField enemyBattleFieldManager) {
-        return logic.makeMove(storage.getMoveField());
+
+    public Coordinate makeMove(Radar radar) {
+        return logic.makeMove(radar);
     }
+
     public String getName() {
         return storage.getName();
     }
 
-    public void setName(String name) {
-        storage.setName(name);
-    }
-
-    public ShotMatrix getBattleField() { // ?
+    public ShotMatrix getBattleFieldShotMatrix() {
         return storage.getShotMatrix();
     }
 
-    public void setBattleField(MoveField battleField) { // ?
-        storage.setMoveField(battleField);
+    public BattleField getBattleField() {
+        return storage.getBattleField();
     }
-    public HitResults move(Coordinate coordinate) { // здесь пока не понятно, но ход у нас не повторяется
-        return getBattleField().getHitResultAtCoordinate(coordinate);
+
+    public void setBattleField(BattleField battleField) { // TODO ?
+        storage.setBattleField(battleField);
+    }
+
+    public void setShotMatrix(ShotMatrix shotMatrix) {
+        storage.setShotMatrix(shotMatrix);
+    }
+
+    public HitResults move(Coordinate coordinate) {
+        return radar.getHitResultAtCoordinate(coordinate);
+    }
+
+    public PlayerStorage getStorage() {
+        return storage;
+    }
+
+    public PlayerLogic getLogic() {
+        return logic;
+    }
+
+    public Radar getRadar() {
+        return radar;
     }
 }

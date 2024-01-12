@@ -3,6 +3,7 @@ package org.example.tulitskayte_d_v.view;
 import org.example.tulitskayte_d_v.cell.Cell;
 import org.example.tulitskayte_d_v.cell.CellStates;
 import org.example.tulitskayte_d_v.controller.BattleField;
+import org.example.tulitskayte_d_v.controller.Radar;
 import org.example.tulitskayte_d_v.model.game.utils.FieldCalculator;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.CoordinateHelper;
 import org.example.tulitskayte_d_v.model.game.utils.helpers.TextHelper;
@@ -13,8 +14,8 @@ import org.example.tulitskayte_d_v.model.ships.HitResults;
 public class GameDisplay {
     public void printBothBattleFields(Player currentPlayer, Player enemyPlayer) {
         System.out.print("\n");
-        BattleField currentPlayerBattleField = currentPlayer.getBattleField();
-        BattleField enemyPlayerBattleField = enemyPlayer.getBattleField();
+        Radar currentPlayerBattleField = currentPlayer.getRadar();
+        Radar enemyPlayerBattleField = enemyPlayer.getRadar();
         int size = Math.max(currentPlayerBattleField.getSize(), enemyPlayerBattleField.getSize());
 
         printFieldTitle(currentPlayer.getName(), enemyPlayer.getName(), size);
@@ -48,11 +49,11 @@ public class GameDisplay {
         }
     }
 
-    private void printFieldRows(BattleField currentPlayerBattleField, BattleField enemyPlayerBattleField, int size) {
+    private void printFieldRows(Radar currentPlayerRadar, Radar enemyPlayerRadar, int size) {
         int maxLetterLength = CoordinateHelper.numberCoordinateToLetter(size - 1).length();
         for (int i = 0; i < size; i++) {
-            String currentPlayerLine = getFieldLine(currentPlayerBattleField, i, true, maxLetterLength);
-            String enemyPlayerLine = getFieldLine(enemyPlayerBattleField, i, false, maxLetterLength);
+            String currentPlayerLine = getFieldLine(currentPlayerRadar, currentPlayerRadar, i, true, maxLetterLength);
+            String enemyPlayerLine = getFieldLine(enemyPlayerRadar, enemyPlayerRadar, i, false, maxLetterLength);
             System.out.printf("%2d | %s", i + 1, currentPlayerLine);
             System.out.print("  ");
             System.out.printf("%2d | %s", i + 1, enemyPlayerLine);
@@ -60,16 +61,16 @@ public class GameDisplay {
         }
     }
 
-    private String getFieldLine(BattleField battleField, int row, boolean isPlayerField, int maxLetterLength) {
+    private String getFieldLine(Radar battleField, Radar radar, int row, boolean isPlayerField, int maxLetterLength) {
         int size = battleField.getSize();
         StringBuilder line = new StringBuilder();
         for (int col = 0; col < size; col++) {
-            line.append(getCellSymbol(battleField, row, col, isPlayerField)).append(" | ");
+            line.append(getCellSymbol(battleField, radar, row, col, isPlayerField)).append(" | ");
         }
         return line.toString();
     }
 
-    private String getCellSymbol(BattleField battleField, int row, int col, boolean isPlayerField) {
+    private String getCellSymbol(Radar battleField, Radar radar, int row, int col, boolean isPlayerField) {
         Cell shipCell = battleField.getCells()[row][col];
         Cell shotCell = battleField.getShotCells()[row][col];
 

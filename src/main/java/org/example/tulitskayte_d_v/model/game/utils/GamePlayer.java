@@ -1,6 +1,7 @@
 package org.example.tulitskayte_d_v.model.game.utils;
 
 
+import org.example.tulitskayte_d_v.controller.Radar;
 import org.example.tulitskayte_d_v.model.player.*;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.history.GameHistory;
@@ -46,7 +47,7 @@ public class GamePlayer {
     }
 
     private GamePhase performGameRound(Player firstPlayer, Player secondPlayer, GamePhase state, GameHistory gameHistory, Scanner sc) {
-        GameState gameStateBeforeMove = new GameState(firstPlayer.getBattleField(), secondPlayer.getBattleField(), state);
+        GameState gameStateBeforeMove = new GameState(firstPlayer.getStorage(), secondPlayer.getStorage(), state);
 
         state = (state == GamePhase.FIRST_PLAYER_MOTION)
                 ? playerMove(firstPlayer, secondPlayer, state)
@@ -56,7 +57,7 @@ public class GamePlayer {
             return state;
         }
 
-        GameState gameStateAfterMove = new GameState(firstPlayer.getBattleField(), secondPlayer.getBattleField(), state);
+        GameState gameStateAfterMove = new GameState(firstPlayer.getStorage(), secondPlayer.getStorage(), state);
         gameHistory.saveMove(new Move(gameStateBeforeMove, gameStateAfterMove));
 
         gameDisplay.printBothBattleFields((state == GamePhase.FIRST_PLAYER_MOTION) ? secondPlayer : firstPlayer, (state == GamePhase.FIRST_PLAYER_MOTION) ? firstPlayer : secondPlayer);
@@ -72,7 +73,7 @@ public class GamePlayer {
             if (response.equalsIgnoreCase("yes")) {
                 GameState prevState = gameHistory.undo();
                 if (prevState != null) {
-                    restoreGameState(prevState, firstPlayer, secondPlayer);
+//                    restoreGameState(prevState, firstPlayer, secondPlayer);
                     state = prevState.getCurrentTurn() == GamePhase.FIRST_PLAYER_MOTION ? GamePhase.SECOND_PLAYER_MOTION : GamePhase.FIRST_PLAYER_MOTION; // переключение текущего игрока
                     gameDisplay.printBothBattleFields(firstPlayer, secondPlayer);
                 }
@@ -104,17 +105,29 @@ public class GamePlayer {
         return size;
     }
 
-    private GamePhase restoreGameState(GameState gameState, Player firstPlayer, Player secondPlayer) {
-        firstPlayer.setBattleField(gameState.getBattleFieldPlayer1().deepCopy()); // восстановление состояния игровых полей
-        secondPlayer.setBattleField(gameState.getBattleFieldPlayer2().deepCopy());
-        return gameState.getCurrentTurn();// восстановление текущей фазы игры
-    }
+//    private GamePhase restoreGameState(GameState gameState, Player firstPlayer, Player secondPlayer) {
+//        PlayerStorage firstPlayerStorage = gameState.getBattleFieldPlayer1();
+//        PlayerStorage secondPlayerStorage = gameState.getBattleFieldPlayer2();
+//
+//        if (firstPlayerStorage.getBattleField() != null && firstPlayerStorage.getShotMatrix() != null) {
+//            firstPlayer.setBattleField(firstPlayerStorage.getBattleField());
+//            firstPlayer.setShotMatrix(firstPlayerStorage.getShotMatrix());
+//        }
+//
+//        if (secondPlayerStorage.getBattleField() != null && secondPlayerStorage.getShotMatrix() != null) {
+//            secondPlayer.setBattleField(secondPlayerStorage.getBattleField());
+//            secondPlayer.setShotMatrix(secondPlayerStorage.getShotMatrix());
+//        }
+//
+//        return gameState.getCurrentTurn();
+//    }
 
     public GamePhase playerMove(Player player, Player enemy, GamePhase state) {
         Coordinate coordinate;
         boolean isValidMove;
+        Radar radar = new Radar(player.getBattleField(), enemy.getBattleFieldShotMatrix()); // TODO ?
         do {
-            coordinate = player.makeMove(); // makeMove(enemy.getBattleField())
+            coordinate = player.makeMove(radar);
             isValidMove = isValidMove(coordinate, enemy);
             if (!isValidMove) {
                 System.out.println("Wrong move. Please select other coordinates.");
@@ -127,7 +140,7 @@ public class GamePlayer {
     }
 
     private static boolean isValidMove(Coordinate coordinate, Player enemy) {
-        return enemy.getBattleField().isValidMove(coordinate);
+        return enemy.getRadar().isValidMove(coordinate); //
     }
 
     public Player initializePlayer(Scanner sc, String playerLabel) {
@@ -148,6 +161,8 @@ public class GamePlayer {
     }
 
     private void setupPlayerShips(Scanner sc, Player player) {
+        player.getStorage().setBattleField(player.getBattleField());
+        player.getStorage().setShotMatrix(player.getBattleFieldShotMatrix());
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
@@ -160,12 +175,13 @@ public class GamePlayer {
                 System.out.println("Please try again.");
             } catch (Exception e) {
                 System.out.println("There was an unexpected error: " + e.getMessage());
+                break;
             }
         }
     }
 
     public GamePhase updateGameState(HitResults resultOfMove, GamePhase state, Player player, Player enemy) {
-        if (enemy.getBattleField().isEnemyLose()) {
+        if (enemy.getBattleField().isEnemyLose()) { //
             gameDisplay.printWinner(player.getName());
             return GamePhase.END;
         }

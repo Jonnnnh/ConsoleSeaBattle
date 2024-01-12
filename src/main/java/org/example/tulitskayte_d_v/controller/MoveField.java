@@ -15,17 +15,13 @@ public interface MoveField {
 
     CellStates getCellState(int row, int column);
 
-    void updateLastShotCoordinate(Coordinate coordinate);
-
-    Coordinate getLastShotCoordinate();
-
     List<Ship> getShips();
 
     Cell[][] getShotCells();
+    Cell[][] getCells();
 
     HitResults getHitResultAtCoordinate(Coordinate coordinate);
 
-    boolean isEnemyLose();
-
     MoveField deepCopy();
+    boolean isEnemyLose();
 }

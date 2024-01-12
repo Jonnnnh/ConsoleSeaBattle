@@ -9,54 +9,55 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.List;
 
 public class Radar implements MoveField {
-    //TODO: в радаре мы не храним последние выстрел, было как-то тоже передавать
-    // TODO: радар должен принимать ссылку на BattleField расстановки кораблей и ShotMatrix, это как раз создает эффект радара
     private final BattleField battleField;
-    private Coordinate lastShotCoordinate;
+    private final ShotMatrix shotMatrix;
 
-    public Radar(BattleField battleField) {
+    public Radar(BattleField battleField, ShotMatrix shotMatrix) {
         this.battleField = battleField;
+        this.shotMatrix = shotMatrix;
     }
 
     @Override
     public int getSize() {
-        return battleField.getSize();
+        return shotMatrix.getSize();
     }
 
     @Override
     public boolean isValidMove(Coordinate coordinate) {
-        return false;
+        return battleField.isWithinBounds(coordinate.getRow(), coordinate.getColumn())
+                && !shotMatrix.isShot(coordinate);
     }
 
     @Override
     public CellStates getCellState(int row, int column) {
-        if (battleField.isWithinBounds(row, column)) {
-            return battleField.getShotMatrix().getShotCells()[row][column].getState();
-        }
-        return null;
-    }
-
-    public void updateLastShotCoordinate(Coordinate coordinate) {
-        this.lastShotCoordinate = coordinate;
-    }
-
-    public Coordinate getLastShotCoordinate() {
-        return lastShotCoordinate;
+        return shotMatrix.getShotCells()[row][column].getState();
     }
 
     @Override
     public List<Ship> getShips() {
-        return null;
+        return battleField.getShips();
     }
 
     @Override
     public Cell[][] getShotCells() {
-        return battleField.getShotCells();
+        return shotMatrix.getShotCells();
     }
 
     @Override
+    public Cell[][] getCells() {
+        return battleField.getCells();
+    }
+
     public HitResults getHitResultAtCoordinate(Coordinate coordinate) {
-        return battleField.hitBattleField(coordinate);
+        if (isValidMove(coordinate)) {
+            shotMatrix.markShot(coordinate);
+            return checkForHit(coordinate);
+        }
+        return HitResults.MISS;
+    }
+
+    private HitResults checkForHit(Coordinate coordinate) {
+        return battleField.hitBattleField(coordinate, shotMatrix); // проверяем, есть ли попадание по кораблю из BattleField
     }
 
     @Override
@@ -64,14 +65,10 @@ public class Radar implements MoveField {
         return battleField.isEnemyLose();
     }
 
+    @Override
     public Radar deepCopy() {
-        Radar clonedRadar = new Radar();
-        if (this.lastShotCoordinate != null) {
-            clonedRadar.updateLastShotCoordinate(new Coordinate(
-                    this.lastShotCoordinate.getRow(),
-                    this.lastShotCoordinate.getColumn()
-            ));
-        }
-        return clonedRadar;
+        BattleField copiedBattleField = this.battleField.deepCopy();
+        ShotMatrix copiedShotMatrix = this.shotMatrix.deepCopy();
+        return new Radar(copiedBattleField, copiedShotMatrix);
     }
 }

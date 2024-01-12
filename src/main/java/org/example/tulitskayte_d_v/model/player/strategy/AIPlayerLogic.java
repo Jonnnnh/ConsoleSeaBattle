@@ -1,5 +1,6 @@
 package org.example.tulitskayte_d_v.model.player.strategy;
 
+import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.controller.MoveField;
 import org.example.tulitskayte_d_v.controller.ShipPlacementField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
@@ -15,14 +16,24 @@ public class AIPlayerLogic implements PlayerLogic{
 
     @Override
     public void placeShips(ShipPlacementField battleFieldManager, ArrayList<Ship> ships) {
+        if (battleFieldManager == null) {
+            throw new IllegalArgumentException("BattleFieldManager cannot be null");
+        }
+        if (ships == null) {
+            throw new IllegalArgumentException("List of ships cannot be null");
+        }
         String shipPlacement = ShipPlacementGenerator.generateBotShipPlacement(battleFieldManager.getSize());
         List<Ship> generatedShips = GameUtils.convertStringToShips(battleFieldManager.getSize(), shipPlacement);
+        if (generatedShips.isEmpty()) {
+            throw new IllegalStateException("Generated ships are invalid");
+        }
         ships.addAll(generatedShips);
         battleFieldManager.arrangeShips(ships);
     }
 
     @Override
     public Coordinate makeMove(MoveField enemyBattleFieldManager) {
-        return BotMoveSelector.calculateBotNextMove(enemyBattleFieldManager);
+        BotMoveSelector botMoveSelector = new BotMoveSelector();
+        return botMoveSelector.calculateBotNextMove(enemyBattleFieldManager);
     }
 }

@@ -1,9 +1,5 @@
 package org.example.tulitskayte_d_v.controller;
 
-import org.example.tulitskayte_d_v.cell.Cell;
-import org.example.tulitskayte_d_v.cell.CellStates;
-import org.example.tulitskayte_d_v.model.game.Coordinate;
-import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 
 import java.util.List;
@@ -27,33 +23,16 @@ public class BattleFieldManager implements ShipPlacementField {
     }
 
     @Override
-    public boolean canPlaceShip(int row, int col, int shipSize, boolean horizontal) {
-        // проверяем, находятся ли все ячейки корабля в пределах поля
-        if (horizontal && (col + shipSize > battleField.getSize()) ||
-                !horizontal && (row + shipSize > battleField.getSize())) {
-            return false;
-        }
-
-        // проверяем, заняты ли ячейки корабля или его окрестности другими кораблями
-        for (int i = 0; i < shipSize; i++) {
-            int checkRow = row + (horizontal ? 0 : i);
-            int checkCol = col + (horizontal ? i : 0);
-
-            if (!isCellAvailableForShip(checkRow, checkCol)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
     public void arrangeShips(List<Ship> ships) { // здесь мы просто запоминаем, но не ставим
-        battleField.arrangeTheShips(ships); // используем принцип накопителя, накапливаем действия, только потом ставим
+        if (ships == null) {
+            throw new IllegalArgumentException("List of ships cannot be null");
+        }
+        battleField.arrangeTheShips(ships);
     }
-
-    public void fillField(BattleField bf) { // а здесь уже окончательно ставим
-
-    }
+//    @Override
+//    public void fillField(BattleField battleField) { // а здесь уже окончательно ставим
+//        battleField.arrangeTheShips();
+//    }
 
     private boolean isCellAvailableForShip(int row, int col) {
         if (!battleField.isWithinBounds(row, col)) {

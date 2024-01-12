@@ -1,10 +1,15 @@
 package org.example.tulitskayte_d_v.model.player.bot;
 
+import org.example.tulitskayte_d_v.cell.Cell;
 import org.example.tulitskayte_d_v.cell.CellStates;
 import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.controller.MoveField;
+import org.example.tulitskayte_d_v.controller.ShotMatrix;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
-import org.example.tulitskayte_d_v.model.ships.*;
+import org.example.tulitskayte_d_v.model.ships.DeckConditions;
+import org.example.tulitskayte_d_v.model.ships.Ship;
+import org.example.tulitskayte_d_v.model.ships.ShipDeck;
+import org.example.tulitskayte_d_v.model.ships.ShipStates;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,18 +17,8 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 public class BotMoveSelector {
-    public static Coordinate calculateBotNextMove(MoveField enemyBattleFieldManager) {
-        Coordinate lastShotCoordinate = enemyBattleFieldManager.getLastShotCoordinate();
-        HitResults lastHitResult = enemyBattleFieldManager.getHitResultAtCoordinate(lastShotCoordinate);
-
-        if (lastHitResult == HitResults.HURT) {
-            return chooseNextTargetAround(lastShotCoordinate, enemyBattleFieldManager);
-        } else {
-            return findRandomValidAttackCoordinate(enemyBattleFieldManager);
-        }
-    }
-    private static Coordinate chooseNextTargetAround(Coordinate lastShotCoordinate, MoveField enemyBattleFieldManager) {
-        List<Coordinate> potentialTargets = findAdjacentTargets(lastShotCoordinate, enemyBattleFieldManager);
+    public Coordinate calculateBotNextMove(MoveField enemyBattleFieldManager) {
+        List<Coordinate> potentialTargets = findTargetsAroundHurtShip(enemyBattleFieldManager);
 
         if (!potentialTargets.isEmpty()) {
             return selectRandomTargetFromList(potentialTargets, enemyBattleFieldManager);
@@ -31,7 +26,52 @@ public class BotMoveSelector {
         return findRandomValidAttackCoordinate(enemyBattleFieldManager);
     }
 
-    private static List<Coordinate> findAdjacentTargets(Coordinate coordinate, MoveField enemyBattleFieldManager) {
+    protected List<Coordinate> findTargetsAroundHurtShip(MoveField enemyBattleFieldManager) {
+        List<Coordinate> potentialTargets = new ArrayList<>();
+        for (Ship ship : enemyBattleFieldManager.getShips()) {
+            if (ship.getState() == ShipStates.HURT) {
+                for (ShipDeck deck : ship.getDecks()) {
+                    if (deck.getState() == DeckConditions.HURT) {
+                        Coordinate lastHit = new Coordinate(deck.getRow(), deck.getColumn());
+                        potentialTargets.addAll(calculateAttackLineForHurtShip(lastHit, ship, enemyBattleFieldManager));
+                        break; // Прерываем цикл после нахождения первой поврежденной палубы
+                    }
+                }
+            }
+        }
+        return potentialTargets;
+    }
+
+    protected  List<Coordinate> calculateAttackLineForHurtShip(Coordinate lastHit, Ship hurtShip, MoveField enemyBattleFieldManager) {
+        List<Coordinate> lineTargets = new ArrayList<>();
+        // Получаем список поврежденных палуб корабля
+        List<ShipDeck> hurtDecks = hurtShip.getDecks().stream()
+                .filter(deck -> deck.getState() == DeckConditions.HURT)
+                .collect(Collectors.toList());
+
+        if (hurtDecks.size() > 1) {
+            ShipDeck secondLastHitDeck = hurtDecks.get(hurtDecks.size() - 2);
+            Coordinate secondLastHit = new Coordinate(secondLastHitDeck.getRow(), secondLastHitDeck.getColumn());
+            int dRow = lastHit.getRow() - secondLastHit.getRow();
+            int dCol = lastHit.getColumn() - secondLastHit.getColumn();
+            // Проверяем следующую и противоположную координаты в линии попаданий
+            addTargetIfValid(lineTargets, lastHit.getRow() + dRow, lastHit.getColumn() + dCol, enemyBattleFieldManager);
+            addTargetIfValid(lineTargets, hurtDecks.getFirst().getRow() - dRow, hurtDecks.getFirst().getColumn() - dCol, enemyBattleFieldManager);
+        } else {
+            // Добавляем соседние координаты, если у корабля только одна поврежденная палуба
+            lineTargets.addAll(findAdjacentTargets(lastHit, enemyBattleFieldManager));
+        }
+
+        return lineTargets;
+    }
+
+    private void addTargetIfValid(List<Coordinate> lineTargets, int row, int col, MoveField enemyBattleFieldManager) {
+        if (isCoordinateValidForAttack(row, col, enemyBattleFieldManager)) {
+            lineTargets.add(new Coordinate(row, col));
+        }
+    }
+
+    private  List<Coordinate> findAdjacentTargets(Coordinate coordinate, MoveField enemyBattleFieldManager) {
         List<Coordinate> adjacentCoordinates = new ArrayList<>();
         int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
 
@@ -46,17 +86,19 @@ public class BotMoveSelector {
     }
 
     // обновленный метод, который проверяет матриц выстрелов, а не матрицу клеток, и будет атаковать, только в те, в которые ранее не стрелял
-    protected static boolean isCoordinateValidForAttack(int row, int col, MoveField enemyBattleFieldManager) {
+    protected boolean isCoordinateValidForAttack(int row, int col, MoveField enemyBattleFieldManager) {
         int size = enemyBattleFieldManager.getSize();
+        Cell[][] shotCells = enemyBattleFieldManager.getShotCells();
+
         return row >= 0 && row < size && col >= 0 && col < size &&
-                enemyBattleFieldManager.getShotCells()[row][col].getState() == CellStates.EMPTY;
+                shotCells[row][col].getState() == CellStates.EMPTY;
     }
 
-    protected static boolean isCoordinateValidForAttack(Coordinate coordinate, MoveField enemyBattleFieldManager) {
+    protected  boolean isCoordinateValidForAttack(Coordinate coordinate, MoveField enemyBattleFieldManager) {
         return isCoordinateValidForAttack(coordinate.getRow(), coordinate.getColumn(), enemyBattleFieldManager);
     }
 
-    private static Coordinate findRandomValidAttackCoordinate(MoveField enemyBattleFieldManager) {
+    private Coordinate findRandomValidAttackCoordinate(MoveField enemyBattleFieldManager) {
         Random rnd = new Random();
         int size = enemyBattleFieldManager.getSize();
         Coordinate coordinate;
@@ -68,7 +110,7 @@ public class BotMoveSelector {
         return coordinate;
     }
 
-    protected static Coordinate selectRandomTargetFromList(List<Coordinate> targets, MoveField enemyBattleFieldManager) {
+    protected  Coordinate selectRandomTargetFromList(List<Coordinate> targets, MoveField enemyBattleFieldManager) {
         Random rnd = new Random();
         return targets.get(rnd.nextInt(targets.size()));
     }
