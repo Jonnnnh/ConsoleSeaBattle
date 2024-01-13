@@ -6,8 +6,10 @@ import org.example.tulitskayte_d_v.model.game.Coordinate;
 
 public class ShotMatrix implements IShotMatrix {
     private final Cell[][] shotCells;
+    private final int size;
 
     public ShotMatrix(int size) {
+        this.size = size;
         this.shotCells = new Cell[size][size];
         initializeCells();
     }
@@ -19,6 +21,28 @@ public class ShotMatrix implements IShotMatrix {
             }
         }
     }
+    void makeChecked(int row, int column) {
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = column - 1; j <= column + 1; j++) {
+                if (isWithinBounds(i, j)) {
+                    markShot(new Coordinate(i, j));
+                }
+            }
+        }
+    }
+    boolean isWithinBounds(int row, int column) {
+        return row >= 0 && row < size && column >= 0 && column < size;
+    }
+
+    public boolean isValidMove(Coordinate coordinate) {
+        return isWithinBounds(coordinate.getRow(), coordinate.getColumn())
+                && !isShot(coordinate);
+    }
+
+    public int getSize() {
+        return size;
+    }
+
     public void markShot(Coordinate coordinate) {
         shotCells[coordinate.getRow()][coordinate.getColumn()].setState(CellStates.CHECKED);
     }
@@ -30,6 +54,7 @@ public class ShotMatrix implements IShotMatrix {
     public Cell[][] getShotCells() {
         return shotCells;
     }
+
     public ShotMatrix deepCopy() {
         int size = shotCells.length;
         ShotMatrix clonedMatrix = new ShotMatrix(size);

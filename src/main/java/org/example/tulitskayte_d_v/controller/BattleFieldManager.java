@@ -9,51 +9,11 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.List;
 
 
-public class BattleFieldManager implements ShipPlacementField, MoveField {
+public class BattleFieldManager implements ShipPlacementField {
     private final BattleField battleField;
-    private final Radar radar;
-    public BattleFieldManager(BattleField battleField, Radar radar) {
+
+    public BattleFieldManager(BattleField battleField) {
         this.battleField = battleField;
-        this.radar = radar;
-    }
-
-    @Override
-    public boolean isValidMove(Coordinate coordinate) {
-        return battleField.isValidMove(coordinate);
-    }
-
-    @Override
-    public CellStates getCellState(int row, int column) {
-        if (battleField.isWithinBounds(row, column)) {
-            return battleField.getShotMatrix().getShotCells()[row][column].getState();
-        }
-        return null;
-    }
-
-
-    @Override
-    public void updateLastShotCoordinate(Coordinate coordinate) {
-        radar.updateLastShotCoordinate(coordinate);
-    }
-
-    @Override
-    public Coordinate getLastShotCoordinate() {
-        return radar.getLastShotCoordinate();
-    }
-
-    @Override
-    public List<Ship> getShips() {
-        return battleField.getShips();
-    }
-
-    @Override
-    public Cell[][] getShotCells() {
-        return battleField.getShotMatrix().getShotCells();
-    }
-
-    @Override
-    public HitResults getHitResultAtCoordinate(Coordinate coordinate) {
-        return battleField.hitBattleField(coordinate);
     }
 
     @Override
@@ -67,28 +27,13 @@ public class BattleFieldManager implements ShipPlacementField, MoveField {
     }
 
     @Override
-    public boolean canPlaceShip(int row, int col, int shipSize, boolean horizontal) {
-        // проверяем, находятся ли все ячейки корабля в пределах поля
-        if (horizontal && (col + shipSize > battleField.getSize()) ||
-                !horizontal && (row + shipSize > battleField.getSize())) {
-            return false;
-        }
-
-        // проверяем, заняты ли ячейки корабля или его окрестности другими кораблями
-        for (int i = 0; i < shipSize; i++) {
-            int checkRow = row + (horizontal ? 0 : i);
-            int checkCol = col + (horizontal ? i : 0);
-
-            if (!isCellAvailableForShip(checkRow, checkCol)) {
-                return false;
-            }
-        }
-        return true;
+    public void arrangeShips(List<Ship> ships) {
+        battleField.addShips(ships);
     }
 
     @Override
-    public void arrangeShips(List<Ship> ships) {
-        battleField.arrangeTheShips(ships);
+    public void fillField(BattleField battleField) {
+        battleField.arrangeTheShips();
     }
 
     private boolean isCellAvailableForShip(int row, int col) {

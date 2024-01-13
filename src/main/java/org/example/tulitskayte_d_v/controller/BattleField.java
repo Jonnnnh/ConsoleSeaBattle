@@ -14,27 +14,32 @@ public class BattleField {
     private int size;
     private Cell[][] cells;
     private List<Ship> ships;
-    private ShotMatrix shotMatrix;
-    private Radar radar;
 
     public BattleField(int size, List<Ship> ships) {
         this.size = size;
         this.cells = new Cell[size][size];
-        this.shotMatrix = new ShotMatrix(size);
-        this.radar = new Radar();
         createEmptyCells(this.cells);
-        arrangeTheShips(ships);
+        this.ships = new ArrayList<>();
+        addShips(ships);
+        arrangeTheShips();
+    }
+    public void addShips(List<Ship> newShips) {
+        ships.addAll(newShips);
     }
 
-    // используем матрицу ячеек для расстановки кораблей
-    public void arrangeTheShips(List<Ship> ships) {
-        this.ships = ships;
-        for (Ship s : ships) {
-            for (int i = 0; i < s.getDecks().size(); i++) {
-                int row = s.getDecks().get(i).getRow();
-                int column = s.getDecks().get(i).getColumn();
-                cells[row][column] = new Cell(row, column, true);
-                System.out.print(" ");
+    public void arrangeTheShips() {
+        if (this.ships == null) {
+            this.ships = new ArrayList<>();
+        }
+
+        for (Ship ship : this.ships) {
+            for (ShipDeck deck : ship.getDecks()) {
+                int row = deck.getRow();
+                int column = deck.getColumn();
+
+                if (row >= 0 && row < this.size && column >= 0 && column < this.size) {
+                    cells[row][column] = new Cell(row, column, true);
+                }
             }
         }
     }
@@ -67,17 +72,14 @@ public class BattleField {
         return cells[row][column].isThereAShip();
     }
 
-    public HitResults hitBattleField(Coordinate coordinate) {
-        shotMatrix.markShot(coordinate);
-        radar.updateLastShotCoordinate(coordinate);
-
+    public HitResults hitBattleField(Coordinate coordinate, ShotMatrix shotMatrix) {
         for (Ship ship : ships) {
             for (ShipDeck shipDeck : ship.getDecks()) {
                 if (shipDeck.getRow() == coordinate.getRow() && shipDeck.getColumn() == coordinate.getColumn()) {
                     ShipStates shipState = ship.hitTheShip(coordinate);
 
                     if (shipState == ShipStates.KILLED) {
-                        killTheShip(ship);
+                        killTheShip(ship, shotMatrix);
                         return HitResults.KILLED;
                     }
                     return HitResults.HURT;
@@ -87,26 +89,11 @@ public class BattleField {
         return HitResults.MISS;
     }
 
-    private void killTheShip(Ship ship) {
+    private void killTheShip(Ship ship, ShotMatrix shotMatrix) {
         for (ShipDeck shipDeck : ship.getDecks()) {
             int row = shipDeck.getRow();
             int column = shipDeck.getColumn();
-            makeChecked(row, column);
-        }
-    }
-
-    public boolean isValidMove(Coordinate coordinate) {
-        return isWithinBounds(coordinate.getRow(), coordinate.getColumn())
-                && !shotMatrix.isShot(coordinate);
-    }
-
-    private void makeChecked(int row, int column) {
-        for (int i = row - 1; i <= row + 1; i++) {
-            for (int j = column - 1; j <= column + 1; j++) {
-                if (isWithinBounds(i, j)) {
-                    shotMatrix.markShot(new Coordinate(i, j));
-                }
-            }
+            shotMatrix.makeChecked(row, column);
         }
     }
 
@@ -116,18 +103,6 @@ public class BattleField {
 
     public Cell[][] getCells() {
         return cells;
-    }
-
-    public Cell[][] getShotCells() {
-        return shotMatrix.getShotCells();
-    }
-
-    public ShotMatrix getShotMatrix() {
-        return shotMatrix;
-    }
-
-    public Radar getRadar() {
-        return radar;
     }
 
     public List<Ship> getShips() {
@@ -160,14 +135,17 @@ public class BattleField {
 
     public BattleField deepCopy() {
         List<Ship> clonedShips = new ArrayList<>();
-        for (Ship ship : this.ships) {
-            clonedShips.add(ship.deepCopy());
+        if (this.ships != null) {
+            for (Ship ship : this.ships) {
+                if (ship != null) {
+                    clonedShips.add(ship.deepCopy());
+                } else {
+                    clonedShips.add(null);
+                }
+            }
         }
-
         BattleField clonedBattleField = new BattleField(this.size, clonedShips);
         clonedBattleField.cells = copyCells(this.cells);
-        clonedBattleField.shotMatrix = this.shotMatrix.deepCopy();
-        clonedBattleField.radar = this.radar.deepCopy();
         return clonedBattleField;
     }
 

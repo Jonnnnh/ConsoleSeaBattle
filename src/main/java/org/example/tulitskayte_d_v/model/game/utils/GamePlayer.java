@@ -2,10 +2,16 @@ package org.example.tulitskayte_d_v.model.game.utils;
 
 
 import org.example.tulitskayte_d_v.controller.BattleField;
-import org.example.tulitskayte_d_v.model.player.*;
+import org.example.tulitskayte_d_v.controller.BattleFieldManager;
+import org.example.tulitskayte_d_v.controller.Radar;
+import org.example.tulitskayte_d_v.controller.ShotMatrix;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.history.GameHistory;
 import org.example.tulitskayte_d_v.model.game.utils.history.Move;
+import org.example.tulitskayte_d_v.model.player.AIPlayerLogic;
+import org.example.tulitskayte_d_v.model.player.HumanPlayerLogic;
+import org.example.tulitskayte_d_v.model.player.Player;
+import org.example.tulitskayte_d_v.model.player.PlayerBuilder;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.view.GameDisplay;
@@ -112,21 +118,31 @@ public class GamePlayer {
     public GamePhase playerMove(Player player, Player enemy, GamePhase state) {
         Coordinate coordinate;
         boolean isValidMove;
+
+        ShotMatrix enemyShotMatrix = enemy.getBattleFieldShotMatrix();
+        Radar radar = new Radar(player.getBattleField(), enemyShotMatrix);
+
         do {
-            coordinate = player.makeMove(enemy.getBattleField());
+            coordinate = player.makeMove(radar);
             isValidMove = isValidMove(coordinate, enemy);
             if (!isValidMove) {
-                System.out.println("Wrong move. Please select other coordinates.");
+                System.out.println("Wrong move at " + formatCoordinate(coordinate) + ". Please select other coordinates.");
             }
         } while (!isValidMove);
 
-        HitResults resultOfMove = enemy.move(coordinate);
+        HitResults resultOfMove = radar.getHitResultAtCoordinate(coordinate);
         gameDisplay.processMoveResult(resultOfMove, player);
         return updateGameState(resultOfMove, state, player, enemy);
     }
 
+    private String formatCoordinate(Coordinate coordinate) {
+        int row = coordinate.getRow();
+        int column = coordinate.getColumn();
+        return "Row: " + row + ", Column: " + column;
+    }
+
     private static boolean isValidMove(Coordinate coordinate, Player enemy) {
-        return enemy.getBattleField().isValidMove(coordinate);
+        return enemy.getBattleFieldShotMatrix().isValidMove(coordinate);
     }
 
     public Player initializePlayer(Scanner sc, String playerLabel) {
@@ -150,16 +166,24 @@ public class GamePlayer {
         boolean shipsArranged = false;
         while (!shipsArranged) {
             try {
-                ArrayList<Ship> ships = new ArrayList<>();
+                ShotMatrix shotMatrix = new ShotMatrix(fieldSize);
+                BattleField battleField = new BattleField(fieldSize, new ArrayList<>());
+
+                player.setShotMatrix(shotMatrix);
+                player.setBattleField(battleField);
+
                 gameDisplay.onArrangeShipsHint(player.getName(), fieldSize);
-                player.placeShips(new BattleField(fieldSize, ships), ships);
-                player.setBattleField(new BattleField(fieldSize, ships));
+
+                player.placeShips(new ArrayList<>());
+
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
                 System.out.println("Please try again.");
             } catch (Exception e) {
-                System.out.println("There was an unexpected error: " + e.getMessage());
+                System.out.println("There was an unexpected error: ");
+                e.printStackTrace();
+                break;
             }
         }
     }

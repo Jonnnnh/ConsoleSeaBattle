@@ -1,6 +1,8 @@
 package org.example.tulitskayte_d_v.model.player;
 
 import org.example.tulitskayte_d_v.controller.BattleField;
+import org.example.tulitskayte_d_v.controller.MoveField;
+import org.example.tulitskayte_d_v.controller.ShipPlacementField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.game.utils.CoordinateParser;
 import org.example.tulitskayte_d_v.model.game.utils.GameUtils;
@@ -19,14 +21,14 @@ public class HumanPlayerLogic implements PlayerLogic{
     }
 
     @Override
-    public void placeShips(BattleField battleField, ArrayList<Ship> ships) {
+    public void placeShips(ShipPlacementField battleField, ArrayList<Ship> ships) {
         while (true) {
             try {
                 System.out.println("\nEnter the location of the ships (e.g. g1-g2, D1-D4):");
                 String shipPlacement = scanner.nextLine();
                 List<Ship> parsedShips = GameUtils.convertStringToShips(battleField.getSize(), shipPlacement);
                 ships.addAll(parsedShips);
-                battleField.arrangeTheShips(ships);
+                battleField.arrangeShips(ships);
                 break;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage() + "\nPlease try again.");
@@ -35,13 +37,13 @@ public class HumanPlayerLogic implements PlayerLogic{
     }
 
     @Override
-    public Coordinate makeMove(BattleField enemyBattleField) {
+    public Coordinate makeMove(MoveField enemyBattleFieldManager) {
         while (true) {
             try {
                 System.out.println("\nEnter the coordinates for the attack (e.g. g1):");
                 String input = scanner.nextLine();
                 Coordinate coordinate = CoordinateParser.getCoordinate(input);
-                if (!isValidCoordinate(coordinate, enemyBattleField)) {
+                if (!isValidCoordinate(coordinate, enemyBattleFieldManager)) {
                     System.out.println("Wrong move. Select coordinates within the field.");
                     continue;
                 }
@@ -51,7 +53,7 @@ public class HumanPlayerLogic implements PlayerLogic{
             }
         }
     }
-    private boolean isValidCoordinate(Coordinate coordinate, BattleField battleField) {
+    private boolean isValidCoordinate(Coordinate coordinate, MoveField battleField) {
         int row = coordinate.getRow();
         int col = coordinate.getColumn();
         return row >= 0 && row < battleField.getSize() && col >= 0 && col < battleField.getSize();
