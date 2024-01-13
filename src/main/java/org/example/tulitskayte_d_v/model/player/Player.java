@@ -8,7 +8,7 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.ArrayList;
 
 public class Player {
-    private final PlayerStorage storage;
+    private PlayerStorage storage;
     private final PlayerLogic logic;
 
     public Player(PlayerStorage storage, PlayerLogic logic) {
@@ -52,5 +52,9 @@ public class Player {
 
     public PlayerStorage getStorage() {
         return storage;
+    }
+
+    public void setStorage(PlayerStorage playerStorage) {
+        this.storage = playerStorage;
     }
 }

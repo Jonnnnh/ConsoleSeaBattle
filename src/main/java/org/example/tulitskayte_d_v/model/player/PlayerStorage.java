@@ -31,4 +31,12 @@ public class PlayerStorage {
     public BattleField getBattleField() {
         return battleField;
     }
+
+    public PlayerStorage deepCopy() {
+        PlayerStorage copy = new PlayerStorage();
+        copy.setName(this.name);
+        copy.setBattleField(this.battleField.deepCopy());
+        copy.setShotMatrix(this.shotMatrix.deepCopy());
+        return copy;
+    }
 }

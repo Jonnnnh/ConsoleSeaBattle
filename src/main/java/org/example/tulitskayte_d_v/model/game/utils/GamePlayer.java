@@ -51,7 +51,7 @@ public class GamePlayer {
     }
 
     private GamePhase performGameRound(Player firstPlayer, Player secondPlayer, GamePhase state, GameHistory gameHistory, Scanner sc) {
-        GameState gameStateBeforeMove = new GameState(firstPlayer.getBattleField(), secondPlayer.getBattleField(), state);
+        GameState gameStateBeforeMove = new GameState(firstPlayer.getStorage(), secondPlayer.getStorage(), state);
 
         state = (state == GamePhase.FIRST_PLAYER_MOTION)
                 ? playerMove(firstPlayer, secondPlayer, state)
@@ -61,7 +61,7 @@ public class GamePlayer {
             return state;
         }
 
-        GameState gameStateAfterMove = new GameState(firstPlayer.getBattleField(), secondPlayer.getBattleField(), state);
+        GameState gameStateAfterMove = new GameState(firstPlayer.getStorage(), secondPlayer.getStorage(), state);
         gameHistory.saveMove(new Move(gameStateBeforeMove, gameStateAfterMove));
 
         gameDisplay.printBothBattleFields((state == GamePhase.FIRST_PLAYER_MOTION) ? secondPlayer : firstPlayer, (state == GamePhase.FIRST_PLAYER_MOTION) ? firstPlayer : secondPlayer);
@@ -110,8 +110,8 @@ public class GamePlayer {
     }
 
     private GamePhase restoreGameState(GameState gameState, Player firstPlayer, Player secondPlayer) {
-        firstPlayer.setBattleField(gameState.getBattleFieldPlayer1().deepCopy()); // восстановление состояния игровых полей
-        secondPlayer.setBattleField(gameState.getBattleFieldPlayer2().deepCopy());
+        firstPlayer.setStorage(gameState.getBattleFieldPlayer1().deepCopy()); // восстановление состояния игровых полей
+        secondPlayer.setStorage(gameState.getBattleFieldPlayer2().deepCopy());
         return gameState.getCurrentTurn();// восстановление текущей фазы игры
     }
 
@@ -168,6 +168,7 @@ public class GamePlayer {
             try {
                 ShotMatrix shotMatrix = new ShotMatrix(fieldSize);
                 BattleField battleField = new BattleField(fieldSize, new ArrayList<>());
+                BattleFieldManager bfManager = new BattleFieldManager(battleField);
 
                 player.setShotMatrix(shotMatrix);
                 player.setBattleField(battleField);
@@ -175,7 +176,7 @@ public class GamePlayer {
                 gameDisplay.onArrangeShipsHint(player.getName(), fieldSize);
 
                 player.placeShips(new ArrayList<>());
-
+//                bfManager.fillField();
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
