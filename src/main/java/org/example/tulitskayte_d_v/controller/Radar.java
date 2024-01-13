@@ -9,8 +9,8 @@ import org.example.tulitskayte_d_v.model.ships.Ship;
 import java.util.List;
 
 public class Radar implements MoveField {
-    private BattleField battleField;
-    private ShotMatrix shotMatrix;
+    private final BattleField battleField;
+    private final ShotMatrix shotMatrix;
 
 
     public Radar(BattleField battleField, ShotMatrix shotMatrix) {
@@ -50,16 +50,13 @@ public class Radar implements MoveField {
         return shotMatrix.getShotCells();
     }
 
-    public HitResults getHitResultAtCoordinate(Coordinate coordinate) {
-        if (isValidMove(coordinate)) {
-            shotMatrix.markShot(coordinate);
-            return checkForHit(coordinate);
+    public HitResults getHitResultAtCoordinate(Coordinate coordinate, BattleField enemyBattleField) {
+        if (!isValidMove(coordinate)) {
+            return HitResults.MISS;
         }
-        return HitResults.MISS;
-    }
 
-    private HitResults checkForHit(Coordinate coordinate) {
-        return battleField.hitBattleField(coordinate, shotMatrix);
+        shotMatrix.markShot(coordinate);
+        return battleField.hitBattleField(coordinate, shotMatrix, enemyBattleField);
     }
 
     @Override

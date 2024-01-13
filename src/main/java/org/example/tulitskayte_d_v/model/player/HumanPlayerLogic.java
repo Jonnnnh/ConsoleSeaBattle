@@ -1,6 +1,5 @@
 package org.example.tulitskayte_d_v.model.player;
 
-import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.controller.MoveField;
 import org.example.tulitskayte_d_v.controller.ShipPlacementField;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
@@ -12,9 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class HumanPlayerLogic implements PlayerLogic{
+public class HumanPlayerLogic implements PlayerLogic {
     private final Scanner scanner;
-
 
     public HumanPlayerLogic() {
         this.scanner = new Scanner(System.in);
@@ -53,6 +51,7 @@ public class HumanPlayerLogic implements PlayerLogic{
             }
         }
     }
+
     private boolean isValidCoordinate(Coordinate coordinate, MoveField battleField) {
         int row = coordinate.getRow();
         int col = coordinate.getColumn();

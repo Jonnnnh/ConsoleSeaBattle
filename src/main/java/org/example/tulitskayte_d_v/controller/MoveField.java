@@ -19,7 +19,9 @@ public interface MoveField {
 
     Cell[][] getShotCells();
 
-    HitResults getHitResultAtCoordinate(Coordinate coordinate);
+    HitResults getHitResultAtCoordinate(Coordinate coordinate, BattleField enemyBattleField);
+
     MoveField deepCopy();
+
     boolean isEnemyLose();
 }

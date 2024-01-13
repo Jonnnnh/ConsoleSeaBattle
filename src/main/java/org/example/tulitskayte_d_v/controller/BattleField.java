@@ -1,7 +1,9 @@
 package org.example.tulitskayte_d_v.controller;
 
 import org.example.tulitskayte_d_v.cell.Cell;
+import org.example.tulitskayte_d_v.cell.CellStates;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
+import org.example.tulitskayte_d_v.model.player.Player;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.model.ships.ShipDeck;
@@ -11,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BattleField {
-    private int size;
+    private final int size;
     private Cell[][] cells;
     private List<Ship> ships;
 
@@ -72,13 +74,15 @@ public class BattleField {
         return cells[row][column].isThereAShip();
     }
 
-    public HitResults hitBattleField(Coordinate coordinate, ShotMatrix shotMatrix) {
-        for (Ship ship : ships) {
-            for (ShipDeck shipDeck : ship.getDecks()) {
-                if (shipDeck.getRow() == coordinate.getRow() && shipDeck.getColumn() == coordinate.getColumn()) {
-                    ShipStates shipState = ship.hitTheShip(coordinate);
+    public HitResults hitBattleField(Coordinate coordinate, ShotMatrix shotMatrix, BattleField enemyBattleField) {
+        Cell targetCell = enemyBattleField.getCells()[coordinate.getRow()][coordinate.getColumn()];
+        targetCell.setState(CellStates.CHECKED);
 
-                    if (shipState == ShipStates.KILLED) {
+        for (Ship ship : enemyBattleField.getShips()) {
+            for (ShipDeck deck : ship.getDecks()) {
+                if (deck.getRow() == coordinate.getRow() && deck.getColumn() == coordinate.getColumn()) {
+                    ship.hitTheShip(coordinate);
+                    if (ship.getState() == ShipStates.KILLED) {
                         killTheShip(ship, shotMatrix);
                         return HitResults.KILLED;
                     }
@@ -86,7 +90,8 @@ public class BattleField {
                 }
             }
         }
-        return HitResults.MISS;
+
+        return targetCell.isThereAShip() ? HitResults.HURT : HitResults.MISS;
     }
 
     private void killTheShip(Ship ship, ShotMatrix shotMatrix) {

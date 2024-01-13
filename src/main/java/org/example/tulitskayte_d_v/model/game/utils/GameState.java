@@ -1,6 +1,5 @@
 package org.example.tulitskayte_d_v.model.game.utils;
 
-import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.model.player.PlayerStorage;
 
 public class GameState {

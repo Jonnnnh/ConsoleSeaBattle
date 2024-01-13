@@ -2,7 +2,6 @@ package org.example.tulitskayte_d_v.model.player;
 
 import org.example.tulitskayte_d_v.controller.*;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
-import org.example.tulitskayte_d_v.model.ships.HitResults;
 import org.example.tulitskayte_d_v.model.ships.Ship;
 
 import java.util.ArrayList;
@@ -28,10 +27,6 @@ public class Player {
 
     public String getName() {
         return storage.getName();
-    }
-
-    public void setName(String name) {
-        storage.setName(name);
     }
 
     public BattleField getBattleField() {

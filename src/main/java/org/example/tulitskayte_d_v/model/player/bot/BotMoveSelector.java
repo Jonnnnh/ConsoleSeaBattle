@@ -2,9 +2,7 @@ package org.example.tulitskayte_d_v.model.player.bot;
 
 import org.example.tulitskayte_d_v.cell.Cell;
 import org.example.tulitskayte_d_v.cell.CellStates;
-import org.example.tulitskayte_d_v.controller.BattleField;
 import org.example.tulitskayte_d_v.controller.MoveField;
-import org.example.tulitskayte_d_v.controller.ShotMatrix;
 import org.example.tulitskayte_d_v.model.game.Coordinate;
 import org.example.tulitskayte_d_v.model.ships.DeckConditions;
 import org.example.tulitskayte_d_v.model.ships.Ship;
@@ -44,7 +42,7 @@ public class BotMoveSelector {
 
     protected  List<Coordinate> calculateAttackLineForHurtShip(Coordinate lastHit, Ship hurtShip, MoveField enemyBattleFieldManager) {
         List<Coordinate> lineTargets = new ArrayList<>();
-        // Получаем список поврежденных палуб корабля
+        // получаем список поврежденных палуб корабля
         List<ShipDeck> hurtDecks = hurtShip.getDecks().stream()
                 .filter(deck -> deck.getState() == DeckConditions.HURT)
                 .collect(Collectors.toList());
@@ -54,11 +52,11 @@ public class BotMoveSelector {
             Coordinate secondLastHit = new Coordinate(secondLastHitDeck.getRow(), secondLastHitDeck.getColumn());
             int dRow = lastHit.getRow() - secondLastHit.getRow();
             int dCol = lastHit.getColumn() - secondLastHit.getColumn();
-            // Проверяем следующую и противоположную координаты в линии попаданий
+            // проверяем следующую и противоположную координаты в линии попаданий
             addTargetIfValid(lineTargets, lastHit.getRow() + dRow, lastHit.getColumn() + dCol, enemyBattleFieldManager);
             addTargetIfValid(lineTargets, hurtDecks.getFirst().getRow() - dRow, hurtDecks.getFirst().getColumn() - dCol, enemyBattleFieldManager);
         } else {
-            // Добавляем соседние координаты, если у корабля только одна поврежденная палуба
+            // добавляем соседние координаты, если у корабля только одна поврежденная палуба
             lineTargets.addAll(findAdjacentTargets(lastHit, enemyBattleFieldManager));
         }
 

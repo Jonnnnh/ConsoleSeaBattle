@@ -13,7 +13,6 @@ import org.example.tulitskayte_d_v.model.player.HumanPlayerLogic;
 import org.example.tulitskayte_d_v.model.player.Player;
 import org.example.tulitskayte_d_v.model.player.PlayerBuilder;
 import org.example.tulitskayte_d_v.model.ships.HitResults;
-import org.example.tulitskayte_d_v.model.ships.Ship;
 import org.example.tulitskayte_d_v.view.GameDisplay;
 
 import java.util.ArrayList;
@@ -120,18 +119,20 @@ public class GamePlayer {
         boolean isValidMove;
 
         ShotMatrix enemyShotMatrix = enemy.getBattleFieldShotMatrix();
-        Radar radar = new Radar(player.getBattleField(), enemyShotMatrix);
+        Radar radar = new Radar(enemy.getBattleField(), enemyShotMatrix);
 
         do {
-            coordinate = player.makeMove(radar);
-            isValidMove = isValidMove(coordinate, enemy);
+            coordinate = player.makeMove(radar); // запрос хода у игрока
+            isValidMove = radar.isValidMove(coordinate); // проверка действительности хода
+
             if (!isValidMove) {
-                System.out.println("Wrong move at " + formatCoordinate(coordinate) + ". Please select other coordinates.");
+                System.out.println("Invalid move at " + formatCoordinate(coordinate) + ". Please select other coordinates.");
             }
         } while (!isValidMove);
 
-        HitResults resultOfMove = radar.getHitResultAtCoordinate(coordinate);
+        HitResults resultOfMove = radar.getHitResultAtCoordinate(coordinate, enemy.getBattleField()); // получение результата выстрела
         gameDisplay.processMoveResult(resultOfMove, player);
+
         return updateGameState(resultOfMove, state, player, enemy);
     }
 
@@ -176,7 +177,6 @@ public class GamePlayer {
                 gameDisplay.onArrangeShipsHint(player.getName(), fieldSize);
 
                 player.placeShips(new ArrayList<>());
-//                bfManager.fillField();
                 shipsArranged = true;
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: " + e.getMessage());
